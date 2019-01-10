@@ -4,7 +4,7 @@ package com.dy.ImageUtil.GeoTiff;
 public class ProtectThread extends Thread {
 	private final Thread[] pool;
 	private final Compare fatherThread;
-	private static final int waitTime = 60 * 1000;
+	private static final int waitTime = 6 * 1000;
 
 	ProtectThread(Thread[] pool, Compare fatherThread) {
 		this.pool = pool;
@@ -20,8 +20,9 @@ public class ProtectThread extends Thread {
 	private int test() {
 		int ret = 0;
 		for (int i = 0; i < pool.length; i++) {
-			if(pool[i]== null) continue;
-			if (pool[i].isAlive() && ((SubCompareThread) pool[i]).stillRun()) {
+			if (pool[i] == null)
+				continue;
+			if (((SubCompareThread) pool[i]).stillRun()) {
 				ret++;
 			}
 		}
@@ -29,11 +30,18 @@ public class ProtectThread extends Thread {
 	}
 
 	@Override
-	public void run() {
+	public synchronized void run() {
 		super.run();
+		for (int i = 0; i < pool.length; i++) {
+			if (pool[i] == null)
+				continue;
+			pool[i].start();
+		}
+		
 		while (!stopFlag) {
+
 			int t = test();
-			
+
 			if (t == 0) {
 				setFlag(true);
 			}
@@ -41,16 +49,15 @@ public class ProtectThread extends Thread {
 			if (fatherThread.threadCount != t) {
 				System.out.println("发现线程意外停止,记录运行线程数:" + fatherThread.threadCount + "实际运行线程数:" + t + "请检查日志。");
 			}
-			fatherThread.threadCount = t;
-
-			fatherThread.notify();
+			
 			try {
-				this.wait(waitTime);
+				sleep(waitTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				setFlag(true);
 				fatherThread.reProtect();
 			}
 		}
+
 	}
 }

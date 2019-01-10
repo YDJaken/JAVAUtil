@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import com.dy.ImageUtil.TiffUtil;
 
-public class Compare extends Thread {
+public class Compare {
 
 	static final boolean DEFAULT = true, ALL = true, SOME = false;
 
@@ -18,7 +18,7 @@ public class Compare extends Thread {
 	private Rectangle[] result;
 	private HashMap<String, Object> config = new HashMap<String, Object>();
 	private Thread[] subThreads;
-	int threadCount = 0;
+	Integer threadCount = 0;
 	private ProtectThread pt;
 
 	public void setConfig(String name, Object value) {
@@ -65,7 +65,7 @@ public class Compare extends Thread {
 		setConfig("startHeight2", 0);
 		// 每次对比的像素数
 		setConfig("pixelSize", 25);
-		// 差异率阈值
+		// 差异率阈值 (不同数大于此阈值算做有区别)
 		setConfig("flagRadio", 50.0);
 		// 设置最大线程数
 		setConfig("maxThreadPool", 10);
@@ -106,6 +106,8 @@ public class Compare extends Thread {
 			StringBuilder a = new StringBuilder();
 			a.append("{\"data\":[\n");
 			for (int i = 0; i < result.length; i++) {
+				if (result[i] == null)
+					continue;
 				a.append("[");
 				double[] target = Rectangle.pack(result[i]);
 				for (int j = 0; j < target.length; j++) {
@@ -147,7 +149,6 @@ public class Compare extends Thread {
 					break;
 				}
 				subThreads[threadCount] = new SubCompareThread(img1[i], img2[i], this);
-				subThreads[threadCount].start();
 				threadCount++;
 			}
 		} else {
@@ -160,7 +161,6 @@ public class Compare extends Thread {
 				}
 				subThreads[threadCount] = new SubCompareThread(img1[Integer.parseInt(target[i])],
 						img2[Integer.parseInt(target[i])], this);
-				subThreads[threadCount].start();
 				threadCount++;
 			}
 		}
@@ -168,17 +168,40 @@ public class Compare extends Thread {
 			pt = new ProtectThread(subThreads, this);
 			pt.start();
 		}
-		while (threadCount > 0) {
-			this.wait();
+		synchronized (this) {
+			if (threadCount > 0) {
+				wait();
+				if (needGo) {
+					startProcess((int) getConfig("currentIndex"));
+				}
+			}
 		}
-		if (needGo) {
-			startProcess((int) getConfig("currentIndex"));
-		}
+
 	}
 
 	// 将图片坐标的矩阵转换为经纬度或者传入坐标系
 	private void transformCoordinate() {
 
+	}
+
+	// 计算图片被切分的矩阵行列数
+	private void computeMatrixSize() {
+		int width1 = (int) Math
+				.ceil(((int) getConfig("imgWith1") - (int) getConfig("startWith1")) / (int) getConfig("pixelSize"));
+		int width2 = (int) Math
+				.ceil(((int) getConfig("imgWith2") - (int) getConfig("startWith2")) / (int) getConfig("pixelSize"));
+		if (width1 != width2) {
+			throw new IllegalStateException("图片参数无法对齐");
+		}
+		int height1 = (int) getConfig("imgHeight1") - (int) getConfig("startHeight1");
+		int height2 = (int) getConfig("imgHeight2") - (int) getConfig("startHeight2");
+		if (height1 != height2) {
+			throw new IllegalStateException("图片参数无法对齐");
+		}
+		// 生成切分矩阵的列数
+		setConfig("compareColumn", width1);
+		// 生成切分矩阵的行数
+		setConfig("compareRow", height1);
 	}
 
 	/**
@@ -188,14 +211,21 @@ public class Compare extends Thread {
 	 * @throws InterruptedException
 	 */
 	public Rectangle[] compare() throws InterruptedException {
+		computeMatrixSize();
 		subThreads = new Thread[(int) getConfig("maxThreadPool")];
 		startProcess((int) getConfig("currentIndex"));
-		if ((boolean) getConfig("needTransform")) {
-			transformCoordinate();
-		} else {
-			return imgBound;
+		synchronized (this) {
+			if (threadCount > 0) {
+				wait();
+			}
+			if ((boolean) getConfig("needTransform")) {
+				transformCoordinate();
+			} else {
+				result = imgBound;
+				return imgBound;
+			}
+			return result;
 		}
-		return result;
 	}
 
 	// 再次激活守护线程
@@ -224,7 +254,16 @@ public class Compare extends Thread {
 	}
 
 	public static void main(String[] args) {
-		new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
+		Compare a = new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
+		try {
+			Rectangle[] b = a.compare();
+			b[0].toString();
+			System.out.println(a.toString());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

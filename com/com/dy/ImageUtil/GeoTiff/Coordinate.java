@@ -14,7 +14,7 @@ public class Coordinate {
 	 * @param angle
 	 */
 	static double angleToRadian(double angle) {
-		return angle * pi / 180;
+		return Math.toRadians(angle);
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class Coordinate {
 	 * @param radian
 	 */
 	static double radianToAngle(double radian) {
-		return radian * 180 / pi;
+		return Math.toDegrees(radian);
 	}
 
 	/**

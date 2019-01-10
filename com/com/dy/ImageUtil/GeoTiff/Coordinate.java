@@ -4,6 +4,7 @@ public class Coordinate {
 
 	static final double pi = Math.PI;
 	static final double two_pi = pi * 2;
+	static final double halfPI = pi / 2.0;
 	static final double epsilon10 = 0.0000000001;
 	static final double epsilon14 = 0.00000000000001;
 

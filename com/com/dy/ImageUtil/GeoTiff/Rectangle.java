@@ -2,28 +2,37 @@ package com.dy.ImageUtil.GeoTiff;
 
 public class Rectangle {
 
-	private double west;
-	private double south;
-	private double east;
-	private double north;
+	double west;
+	double south;
+	double east;
+	double north;
 
-	Rectangle() {
+	public Rectangle() {
 		this(0, 0, 0, 0);
 	}
 
-	Rectangle(double[] array) {
+	public Rectangle(double[] array) {
 		this(array, false);
 	}
 
-	Rectangle(double[] array, boolean degree) {
+	public Rectangle(double[] array, boolean degree) {
 		this(array[0], array[1], array[2], array[3], degree);
 	}
 
-	Rectangle(double west, double south, double east, double north) {
+	public Rectangle(double west, double south, double east, double north) {
 		this(west, south, east, north, false);
 	}
 
-	Rectangle(double west, double south, double east, double north, boolean degree) {
+	/**
+	 * 用经纬度确定的长方形区域或一般长方形
+	 * 
+	 * @param west   最西边的经度点 取值弧度,范围[-PI,PI] 或者 minX
+	 * @param south  最南边的纬度点 取值弧度,范围[-PI/2,PI/2] 或者 minY
+	 * @param east   最东边的经度点 取值弧度,范围[-PI,PI] 或者 maxX
+	 * @param north  最北边的纬度点 取值弧度,范围[-PI/2,PI/2] 或者 maxY
+	 * @param degree 是否使用角度制
+	 */
+	public Rectangle(double west, double south, double east, double north, boolean degree) {
 		if (degree) {
 			west = Coordinate.angleToRadian(west);
 			south = Coordinate.angleToRadian(south);
@@ -36,6 +45,13 @@ public class Rectangle {
 		this.north = north;
 	}
 
+	@Override
+	public String toString(){
+		StringBuilder b = new StringBuilder();
+		b.append("Rectangle:{west:").append(west).append(",south:").append(south).append(",east:").append(east).append(",north:").append(north).append('}');
+		return b.toString();
+	}
+	
 	/**
 	 * 将一个长方形的数据放入数组
 	 * 
@@ -183,6 +199,44 @@ public class Rectangle {
 			return null;
 		}
 		return new Rectangle(west, south, east, north);
+	}
+
+	/**
+	 * 合并两个一般长方形
+	 * 
+	 * @param rectangle
+	 * @param otherRectangle
+	 * @return
+	 */
+	static Rectangle simpleUnion(Rectangle rectangle, Rectangle otherRectangle) {
+		if (!Rectangle.nextTo(rectangle, otherRectangle))
+			return null;
+		double west = Math.min(rectangle.west, otherRectangle.west),
+				south = Math.min(rectangle.south, otherRectangle.south),
+				east = Math.max(rectangle.east, otherRectangle.east),
+				north = Math.max(rectangle.north, otherRectangle.north);
+		return new Rectangle(west, south, east, north);
+	}
+
+	/**
+	 * 判断一个长方形是否与另一个相邻或相交
+	 * @param rectangle
+	 * @param otherRectangle
+	 * @return
+	 */
+	private static boolean nextTo(Rectangle rectangle, Rectangle otherRectangle) {
+		return (Rectangle.between(rectangle.east, rectangle.west, otherRectangle.east)
+				&& Rectangle.between(rectangle.east, rectangle.west, otherRectangle.west)
+				&& (Rectangle.between(rectangle.north, rectangle.south, otherRectangle.south)
+						|| Rectangle.between(rectangle.north, rectangle.south, otherRectangle.north)))
+				|| (Rectangle.between(rectangle.north, rectangle.south, otherRectangle.north)
+						&& Rectangle.between(rectangle.north, rectangle.south, otherRectangle.south)
+						&& (Rectangle.between(rectangle.east, rectangle.west, otherRectangle.west)
+								|| Rectangle.between(rectangle.east, rectangle.west, otherRectangle.east)));
+	}
+
+	private static boolean between(double max, double min, double input) {
+		return input <= max || input >= min;
 	}
 
 	/**

@@ -136,8 +136,8 @@ public class HttpRequestUtil {
 			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 			httpURLConnection.addRequestProperty("wayPoint", data);
 			httpURLConnection.setRequestMethod("POST");
-			httpURLConnection.setConnectTimeout(2500);
-			httpURLConnection.setReadTimeout(2500);
+			httpURLConnection.setConnectTimeout(5000);
+			httpURLConnection.setReadTimeout(5000);
 			httpURLConnection.setDoOutput(true);
 			httpURLConnection.setDoInput(true);
 			BufferedInputStream bis = new BufferedInputStream(httpURLConnection.getInputStream());

@@ -6,19 +6,21 @@ import com.dy.Util.MatrixUtil;
 
 public class SubCompareThread extends Thread {
 
-	private final int pixsize;
 	private final Rectangle[][] matrix;
 	private final BufferedImage img1;
 	private final BufferedImage img2;
 	private final Compare fatherThread;
 	private boolean stopFlag = false;
 	private boolean stillRuning = true;
+	private final int pixelWidth;
+	private final int pixelHeight;
 
 	SubCompareThread(BufferedImage img1, BufferedImage img2, Compare fatherThread) {
 		this.img1 = img1;
 		this.img2 = img2;
 		this.fatherThread = fatherThread;
-		this.pixsize = (int) fatherThread.getConfig("pixelSize");
+		this.pixelWidth = (int) fatherThread.getConfig("pixelWidth");
+		this.pixelHeight = (int) fatherThread.getConfig("pixelHeight");
 		this.matrix = generateMatrix();
 	}
 
@@ -27,17 +29,20 @@ public class SubCompareThread extends Thread {
 				.getConfig("compareColumn")];
 		for (int i = 0; i < ret.length - 1; i++) {
 			for (int j = 0; j < ret[i].length - 1; j++) {
-				ret[i][j] = new Rectangle(j * pixsize, i, (j + 1) * pixsize, (i + 1));
+				ret[i][j] = new Rectangle(j * pixelWidth, i * pixelHeight, (j + 1) * pixelWidth, (i + 1) * pixelHeight);
 			}
 		}
 		return ret;
 	}
 
 	private boolean compareRec(Rectangle rec) {
+		int pixsize = pixelHeight * pixelWidth;
 		int[] ImageOneArray = new int[pixsize];
-		ImageOneArray = img1.getRGB((int) rec.west, (int) rec.south, pixsize, 1, ImageOneArray, 0, pixsize);
+		ImageOneArray = img1.getRGB((int) rec.west, (int) rec.south, pixelWidth, pixelHeight, ImageOneArray, 0,
+				pixelWidth);
 		int[] ImageTwoArray = new int[pixsize];
-		ImageTwoArray = img2.getRGB((int) rec.west, (int) rec.south, pixsize, 1, ImageTwoArray, 0, pixsize);
+		ImageTwoArray = img2.getRGB((int) rec.west, (int) rec.south, pixelWidth, pixelHeight, ImageTwoArray, 0,
+				pixelWidth);
 		int count = 0;
 		for (int i = 0; i < pixsize; i++) {
 			if (stopFlag)
@@ -73,7 +78,8 @@ public class SubCompareThread extends Thread {
 			fatherThread.processRectangle(reformatMatrix(matrix));
 			stillRuning = false;
 			fatherThread.threadCount = fatherThread.threadCount - 1;
-			if(fatherThread.threadCount == 0) fatherThread.notify();
+			if (fatherThread.threadCount == 0)
+				fatherThread.notify();
 		}
 	}
 

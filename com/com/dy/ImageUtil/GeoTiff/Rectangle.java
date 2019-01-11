@@ -1,5 +1,7 @@
 package com.dy.ImageUtil.GeoTiff;
 
+import java.util.HashMap;
+
 public class Rectangle {
 
 	double west;
@@ -7,6 +9,16 @@ public class Rectangle {
 	double east;
 	double north;
 
+	private HashMap<String, Object> config = new HashMap<String, Object>();
+	
+	void setConfig(String name, Object value) {
+		config.put(name, value);
+	}
+
+	Object getConfig(String name) {
+		return config.get(name);
+	}
+	
 	public Rectangle() {
 		this(0, 0, 0, 0);
 	}

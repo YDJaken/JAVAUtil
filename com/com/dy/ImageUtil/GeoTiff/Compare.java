@@ -257,11 +257,8 @@ public class Compare {
 		Compare a = new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
-			Rectangle[] b = a.compare();
-			b[0].toString();
-			System.out.println(a.toString());
+			a.compare();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

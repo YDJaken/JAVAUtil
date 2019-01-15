@@ -26,10 +26,18 @@ public class HttpRequestUtil {
 	 * @return
 	 */
 	public static Detect401 postDownTerrain(String path, File file) {
-		return HttpRequestUtil.postDownTerrain(path, file, 30000);
+		return HttpRequestUtil.postDownTerrain(path,"", file, 30000);
+	}
+	
+	public static Detect401 postDownTerrain(String path ,String token, File file) {
+		return HttpRequestUtil.postDownTerrain(path,token, file, 30000);
+	}
+	
+	public static Detect401 postDownTerrain(String path , File file,int readTime) {
+		return HttpRequestUtil.postDownTerrain(path,"", file, 30000);
 	}
 
-	public static Detect401 postDownTerrain(String path, File file, int readTime) {
+	public static Detect401 postDownTerrain(String path ,String token, File file, int readTime) {
 		URL url = null;
 		try {
 			url = new URL(path);
@@ -42,35 +50,47 @@ public class HttpRequestUtil {
 			httpURLConnection.setRequestProperty("Range", "bytes=" + file.length() + "-");
 			httpURLConnection.addRequestProperty("User-Agent",
 					"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
-			if (httpURLConnection.getResponseCode() == 401) {
-				return new Detect401(401);
-			}
-			if (httpURLConnection.getResponseCode() == 503) {
-				return new Detect401(503);
-			}
-			if (httpURLConnection.getResponseCode() == 500) {
-				return new Detect401(500);
-			}
-			if (httpURLConnection.getResponseCode() == 300) {
+			int ResponseCode = httpURLConnection.getResponseCode();
+			switch (ResponseCode) {
+			case 200:
+				break;
+			case 404:
+				return new Detect401(ResponseCode);
+			case 401:
+				return new Detect401(ResponseCode);
+			case 503:
+				return new Detect401(ResponseCode);
+			case 500:
+				return new Detect401(ResponseCode);
+			case 300:
+				httpURLConnection = (HttpURLConnection) url.openConnection();
+				httpURLConnection.setRequestMethod("GET");
+				httpURLConnection.setConnectTimeout(30000);
+				httpURLConnection.setReadTimeout(readTime);
+				httpURLConnection.setDoOutput(true);
+				httpURLConnection.setDoInput(true);
+				httpURLConnection.addRequestProperty("User-Agent",
+						"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+				httpURLConnection.addRequestProperty("accept", "*/*;" + token);
+				httpURLConnection.addRequestProperty("accept-encoding", "gzip");
+				break;
+			case 416:
+				return new Detect401(ResponseCode);
+			case 429:
+				List<String> code429 = httpURLConnection.getHeaderFields().get("Retry-After");
+				if (code429 != null) {
+					System.out.println(code429.toString());
+					return new Detect401(429, code429.get(0));
+				} else {
+					return new Detect401(429, null);
+				}
+			default:
 				Map<String, List<String>> tmp = httpURLConnection.getHeaderFields();
-				System.out.println(tmp.toString());
 				Set<String> keys = tmp.keySet();
 				Iterator<String> a = keys.iterator();
 				while (a.hasNext()) {
 					String key = (String) a.next();
 					System.out.println(key + ":" + tmp.get(key));
-				}
-			}
-			if (httpURLConnection.getResponseCode() == 416) {
-				return new Detect401();
-			}
-			if (httpURLConnection.getResponseCode() == 429) {
-				List<String> tmp = httpURLConnection.getHeaderFields().get("Retry-After");
-				if (tmp != null) {
-					System.out.println(tmp.toString());
-					return new Detect401(429, tmp.get(0));
-				} else {
-					return new Detect401(429, null);
 				}
 			}
 			BufferedInputStream bis = new BufferedInputStream(httpURLConnection.getInputStream());
@@ -90,7 +110,7 @@ public class HttpRequestUtil {
 				return new Detect401(500, "time out");
 			} else if (e.getMessage().equals("assets.cesium.com")) {
 				System.err.println(e.toString());
-				return new Detect401(401);
+				return new Detect401(500,"assets.cesium.com");
 			} else {
 				System.err.println(e.toString());
 				return new Detect401(500);

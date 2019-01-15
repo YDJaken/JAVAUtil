@@ -12,6 +12,12 @@ public class Coordinate {
 	static final double epsilon10 = 0.0000000001;
 	static final double epsilon12 = 0.000000000001;
 	static final double epsilon14 = 0.00000000000001;
+	/**
+	 * 判断在范围内
+	 */
+	static boolean inRange(double min, double max, double input) {
+        return input <= max && input >= min;
+    }
 
 	/**
 	 * 角度转弧度

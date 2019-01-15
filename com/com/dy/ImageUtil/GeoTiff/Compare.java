@@ -285,11 +285,11 @@ public class Compare {
 		Compare a = new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
-			/*Rectangle[] bs =*/a.compare();
-			/*if(bs[0]==null) {
-				System.out.println("nul");
+			Rectangle[] bs =a.compare();
+			if(bs[0]==null) {
+				System.out.println("null");
 			}
-			System.out.println(a.toString());*/
+			System.out.println(a.toString());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

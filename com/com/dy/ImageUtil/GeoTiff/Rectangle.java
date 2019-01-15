@@ -10,7 +10,7 @@ public class Rectangle {
 	double north;
 
 	private HashMap<String, Object> config = new HashMap<String, Object>();
-	
+
 	void setConfig(String name, Object value) {
 		config.put(name, value);
 	}
@@ -18,7 +18,7 @@ public class Rectangle {
 	Object getConfig(String name) {
 		return config.get(name);
 	}
-	
+
 	public Rectangle() {
 		this(0, 0, 0, 0);
 	}
@@ -58,12 +58,13 @@ public class Rectangle {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append("Rectangle:{west:").append(west).append(",south:").append(south).append(",east:").append(east).append(",north:").append(north).append('}');
+		b.append("Rectangle:{west:").append(west).append(",south:").append(south).append(",east:").append(east)
+				.append(",north:").append(north).append('}');
 		return b.toString();
 	}
-	
+
 	/**
 	 * 将一个长方形的数据放入数组
 	 * 
@@ -112,8 +113,8 @@ public class Rectangle {
 	 * @param rec
 	 * @return
 	 */
-	double[] southwest() {
-		return new double[] { this.west, this.south, 0 };
+	Point southwest() {
+		return new Point(this.west, this.south);
 	}
 
 	/**
@@ -122,8 +123,8 @@ public class Rectangle {
 	 * @param rec
 	 * @return
 	 */
-	double[] northwest() {
-		return new double[] { this.west, this.north, 0 };
+	Point northwest() {
+		return new Point(this.west, this.north);
 	}
 
 	/**
@@ -132,8 +133,8 @@ public class Rectangle {
 	 * @param rec
 	 * @return
 	 */
-	double[] northeast() {
-		return new double[] { this.east, this.north, 0 };
+	Point northeast() {
+		return new Point(this.east, this.north);
 	}
 
 	/**
@@ -142,8 +143,8 @@ public class Rectangle {
 	 * @param rec
 	 * @return
 	 */
-	double[] southeast() {
-		return new double[] { this.east, this.south, 0 };
+	Point southeast() {
+		return new Point(this.east, this.south);
 	}
 
 	/**
@@ -152,12 +153,12 @@ public class Rectangle {
 	 * @param rec
 	 * @return
 	 */
-	double[] center() {
+	Point center() {
 		double east = this.east, west = this.west;
 		if (east < west) {
 			east += Coordinate.two_pi;
 		}
-		return new double[] { Coordinate.negativePIToPI((west + east) * 0.5), (south + north) * 0.5, 0 };
+		return new Point(Coordinate.negativePIToPI((west + east) * 0.5), (south + north) * 0.5);
 	}
 
 	/**
@@ -232,6 +233,7 @@ public class Rectangle {
 
 	/**
 	 * 判断一个长方形是否与另一个相邻或相交
+	 * 
 	 * @param rectangle
 	 * @param otherRectangle
 	 * @return

@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Compare.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Compare.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Coordinate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Process.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Process.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Rectangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Rectangle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/SubCompareThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/SubCompareThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/Util/MatrixUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/Util/MatrixUtil.java" afterDir="false" />
-    </list>
+    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,6 +34,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -52,7 +46,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -89,16 +82,17 @@
       <workItem from="1547016024208" duration="163000" />
       <workItem from="1547098667077" duration="225000" />
       <workItem from="1547113445846" duration="1245000" />
+      <workItem from="1547196564200" duration="78000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3136000" />
+    <option name="totallyTimeSpent" value="3214000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="-2" width="1920" height="1082" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25773746" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26040554" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />

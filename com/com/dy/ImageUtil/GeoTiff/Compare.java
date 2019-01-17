@@ -7,8 +7,8 @@ import java.util.HashMap;
 import com.dy.ImageUtil.TiffUtil;
 
 /**
- * 全局单位 m m^2 m^3
- * GeoTiff 影像对比
+ * 全局单位 m m^2 m^3 GeoTiff 影像对比
+ * 
  * @author dy
  *
  */
@@ -110,12 +110,14 @@ public class Compare {
 		setConfig("longtitudeDelta", (rectangle.east - rectangle.west) / width);
 		// 高度像素变化对应的纬度变化
 		setConfig("latitudeDelta", (rectangle.north - rectangle.south) / height);
-		double realWorldWidth = Coordinate.computeDistance(rectangle.west, rectangle.south, rectangle.west, rectangle.north)[0];
-		double realWorldHeight = Coordinate.computeDistance(rectangle.west, rectangle.south, rectangle.east, rectangle.south)[0];
+		double realWorldWidth = Coordinate.computeDistance(rectangle.west, rectangle.south, rectangle.west,
+				rectangle.north)[0];
+		double realWorldHeight = Coordinate.computeDistance(rectangle.west, rectangle.south, rectangle.east,
+				rectangle.south)[0];
 		// 宽度像素变化对应的现实世界的米数
-		setConfig("realWorldWidthDelta", realWorldWidth/width);
+		setConfig("realWorldWidthDelta", realWorldWidth / width);
 		// 宽度像素变化对应的现实世界的米数
-		setConfig("realWorldHeightDelta",realWorldHeight/height);
+		setConfig("realWorldHeightDelta", realWorldHeight / height);
 	}
 
 	public String toString() {
@@ -207,17 +209,13 @@ public class Compare {
 	private void computeMatrixSize() {
 		int pixelWidth = (int) getConfig("pixelWidth");
 		int pixelHeight = (int) getConfig("pixelHeight");
-		int width1 = (int) Math
-				.ceil(((int) getConfig("imgWidth1") - (int) getConfig("startWidth1")) / pixelWidth);
-		int width2 = (int) Math
-				.ceil(((int) getConfig("imgWidth2") - (int) getConfig("startWidth2")) / pixelWidth);
+		int width1 = (int) Math.ceil(((int) getConfig("imgWidth1") - (int) getConfig("startWidth1")) / pixelWidth);
+		int width2 = (int) Math.ceil(((int) getConfig("imgWidth2") - (int) getConfig("startWidth2")) / pixelWidth);
 		if (width1 != width2) {
 			throw new IllegalStateException("图片参数无法对齐");
 		}
-		int height1 = (int) Math.ceil(
-				((int) getConfig("imgHeight1") - (int) getConfig("startHeight1")) / pixelHeight);
-		int height2 = (int) Math.ceil(
-				((int) getConfig("imgHeight2") - (int) getConfig("startHeight2")) / pixelHeight);
+		int height1 = (int) Math.ceil(((int) getConfig("imgHeight1") - (int) getConfig("startHeight1")) / pixelHeight);
+		int height2 = (int) Math.ceil(((int) getConfig("imgHeight2") - (int) getConfig("startHeight2")) / pixelHeight);
 		if (height1 != height2) {
 			throw new IllegalStateException("图片参数无法对齐");
 		}
@@ -225,9 +223,10 @@ public class Compare {
 		setConfig("compareColumn", width1);
 		// 生成切分矩阵的行数
 		setConfig("compareRow", height1);
-		// 每一个单元对应的面积
-		setConfig("areaPerElement",((double) getConfig("realWorldWidthDelta")*pixelWidth) *((double) getConfig("realWorldHeightDelta")*pixelHeight));
-		System.out.println(getConfig("areaPerElement"));
+		double areaPerElement = ((double) getConfig("realWorldWidthDelta") * pixelWidth)
+				* ((double) getConfig("realWorldHeightDelta") * pixelHeight);
+		// 忽略的单元格子数
+		setConfig("ignoreElementCount",(int)Math.round((int)getConfig("ignoreArea")/areaPerElement));
 	}
 
 	/**
@@ -244,6 +243,8 @@ public class Compare {
 			if (threadCount > 0) {
 				wait();
 			}
+			Process p = new Process(imgBound,(int)getConfig("compareRow"),(int)getConfig("compareColumn"));
+			p.merge();
 			if ((boolean) getConfig("needTransform")) {
 				transformCoordinate();
 			} else {
@@ -253,8 +254,6 @@ public class Compare {
 			return result;
 		}
 	}
-	
-	
 
 	// 再次激活守护线程
 	public void reProtect() {
@@ -265,7 +264,7 @@ public class Compare {
 	}
 
 	public Compare(double[] rectangle, String imgURL1, String imgURL2) {
-		this.rectangle = new Rectangle(reform(rectangle),true);
+		this.rectangle = new Rectangle(reform(rectangle), true);
 		defaultSetting();
 		try {
 			init(imgURL1, imgURL2);
@@ -285,11 +284,12 @@ public class Compare {
 		Compare a = new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
-			Rectangle[] bs =a.compare();
-			if(bs[0]==null) {
-				System.out.println("null");
-			}
-			System.out.println(a.toString());
+//			Rectangle[] bs = 
+					a.compare();
+//			if (bs[0] == null) {
+//				System.out.println("null");
+//			}
+//			System.out.println(a.toString());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

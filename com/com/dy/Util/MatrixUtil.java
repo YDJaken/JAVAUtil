@@ -14,11 +14,11 @@ public class MatrixUtil {
 	public static <T> T[][] generateMatrix(T[][] obj, Class<?> cla, T defalueValue) {
 		for (int i = 0; i < obj.length; i++) {
 			for (int j = 0; j < obj[i].length; j++) {
-				if ((int) Math.round(Math.random()) == 0) {
-					obj[i][j] = null;
-				} else {
+//				if ((int) Math.round(Math.random()) == 0) {
+//					obj[i][j] = null;
+//				} else {
 					obj[i][j] = defalueValue;
-				}
+//				}
 			}
 		}
 		return obj;

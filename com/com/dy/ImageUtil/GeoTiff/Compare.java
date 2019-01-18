@@ -2,7 +2,6 @@ package com.dy.ImageUtil.GeoTiff;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
 
 import com.dy.ImageUtil.TiffUtil;
 
@@ -12,7 +11,7 @@ import com.dy.ImageUtil.TiffUtil;
  * @author dy
  *
  */
-public class Compare {
+public class Compare extends Config {
 
 	// 对比模式
 	static final boolean DEFAULT = true, ALL = true, SOME = false;
@@ -22,19 +21,10 @@ public class Compare {
 	private BufferedImage[] img1;
 	private BufferedImage[] img2;
 	private Rectangle[] imgBound;
-	private Rectangle[] result;
-	private HashMap<String, Object> config = new HashMap<String, Object>();
 	private Thread[] subThreads;
 	Integer threadCount = 0;
 	private ProtectThread pt;
-
-	public void setConfig(String name, Object value) {
-		config.put(name, value);
-	}
-
-	public Object getConfig(String name) {
-		return config.get(name);
-	}
+	
 
 	public Rectangle getRectangle() {
 		return rectangle;
@@ -121,23 +111,23 @@ public class Compare {
 	}
 
 	public String toString() {
-		if (result == null) {
+		if (imgBound == null) {
 			return "";
 		} else {
 			StringBuilder a = new StringBuilder();
 			a.append("{\"data\":[\n");
-			for (int i = 0; i < result.length; i++) {
-				if (result[i] == null)
+			for (int i = 0; i < imgBound.length; i++) {
+				if (imgBound[i] == null)
 					continue;
 				a.append("[");
-				double[] target = Rectangle.pack(result[i]);
+				double[] target = Rectangle.pack(imgBound[i]);
 				for (int j = 0; j < target.length; j++) {
 					a.append(target[j]);
 					if (j != target.length - 1) {
 						a.append(",");
 					}
 				}
-				if (i == result.length - 1) {
+				if (i == imgBound.length - 1) {
 					a.append("]");
 				} else {
 					a.append("],\n");
@@ -243,15 +233,14 @@ public class Compare {
 			if (threadCount > 0) {
 				wait();
 			}
-			Process p = new Process(imgBound,(int)getConfig("compareRow"),(int)getConfig("compareColumn"));
+			Process p = new Process(imgBound,(int)getConfig("compareRow"),(int)getConfig("compareColumn"),this);
 			p.merge();
 			if ((boolean) getConfig("needTransform")) {
 				transformCoordinate();
 			} else {
-				result = imgBound;
 				return imgBound;
 			}
-			return result;
+			return imgBound;
 		}
 	}
 
@@ -263,6 +252,9 @@ public class Compare {
 		}
 	}
 
+	public Compare() {
+	}
+	
 	public Compare(double[] rectangle, String imgURL1, String imgURL2) {
 		this.rectangle = new Rectangle(reform(rectangle), true);
 		defaultSetting();

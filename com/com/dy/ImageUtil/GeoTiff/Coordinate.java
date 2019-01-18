@@ -1,6 +1,6 @@
 package com.dy.ImageUtil.GeoTiff;
 
-public class Coordinate {
+public class Coordinate extends Config {
 
 	static final double pi = Math.PI;
 	static final double two_pi = pi * 2;

@@ -1,23 +1,13 @@
 package com.dy.ImageUtil.GeoTiff;
 
-import java.util.HashMap;
-
-public class Rectangle {
+public class Rectangle extends Config {
 
 	double west;
 	double south;
 	double east;
 	double north;
-
-	private HashMap<String, Object> config = new HashMap<String, Object>();
-
-	void setConfig(String name, Object value) {
-		config.put(name, value);
-	}
-
-	Object getConfig(String name) {
-		return config.get(name);
-	}
+	double width;
+	double height;
 
 	public Rectangle() {
 		this(0, 0, 0, 0);
@@ -55,6 +45,8 @@ public class Rectangle {
 		this.south = south;
 		this.east = east;
 		this.north = north;
+		this.height = north - south;
+		this.width = east - west;
 	}
 
 	@Override
@@ -108,7 +100,7 @@ public class Rectangle {
 	}
 
 	/**
-	 * 返回西南角经纬度 弧度制
+	 * 返回西南角经纬度 弧度制 左下角点
 	 * 
 	 * @param rec
 	 * @return
@@ -118,7 +110,7 @@ public class Rectangle {
 	}
 
 	/**
-	 * 返回西北角经纬度 弧度制
+	 * 返回西北角经纬度 弧度制 左上角点
 	 * 
 	 * @param rec
 	 * @return
@@ -128,7 +120,7 @@ public class Rectangle {
 	}
 
 	/**
-	 * 返回东北角经纬度 弧度制
+	 * 返回东北角经纬度 弧度制 右上角点
 	 * 
 	 * @param rec
 	 * @return
@@ -138,7 +130,7 @@ public class Rectangle {
 	}
 
 	/**
-	 * 返回东南角经纬度 弧度制
+	 * 返回东南角经纬度 弧度制 右下角点
 	 * 
 	 * @param rec
 	 * @return
@@ -159,6 +151,15 @@ public class Rectangle {
 			east += Coordinate.two_pi;
 		}
 		return new Point(Coordinate.negativePIToPI((west + east) * 0.5), (south + north) * 0.5);
+	}
+
+	/**
+	 * 返回点数组 内为{左上角点,右上角点,右下角点,左下角点}
+	 * 
+	 * @return
+	 */
+	Point[] toPointArray() {
+		return new Point[] { northwest(), northeast(), southeast(), southwest() };
 	}
 
 	/**
@@ -194,6 +195,118 @@ public class Rectangle {
 			return null;
 		}
 		return new Rectangle(west, south, east, north);
+	}
+
+	/**
+	 * 判断宽相等的传入矩形是否右相邻
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public boolean rightTo(Rectangle otherRectangle) {
+		return this.north == otherRectangle.north && this.south == otherRectangle.south
+				&& this.east == otherRectangle.west;
+	}
+
+	/**
+	 * 得到两个右接壤矩形的接壤边
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public Point[] rightIntersection(Rectangle otherRectangle) {
+		if (this.east != otherRectangle.west)
+			return null;
+		if (this.south > otherRectangle.north)
+			return null;
+		if (this.north < otherRectangle.south)
+			return null;
+		return new Point[] { this.north > otherRectangle.north ? otherRectangle.northwest() : northeast(),
+				this.south > otherRectangle.south ? southeast() : otherRectangle.southwest() };
+	}
+
+	/**
+	 * 判断宽相等的传入矩形是否左相邻
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public boolean leftTo(Rectangle otherRectangle) {
+		return this.north == otherRectangle.north && this.south == otherRectangle.south
+				&& this.west == otherRectangle.east;
+	}
+
+	/**
+	 * 得到两个左接壤矩形的接壤边
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public Point[] leftIntersection(Rectangle otherRectangle) {
+		if (this.west != otherRectangle.east)
+			return null;
+		if (this.south > otherRectangle.north)
+			return null;
+		if (this.north < otherRectangle.south)
+			return null;
+		return new Point[] { this.north > otherRectangle.north ? otherRectangle.northeast() : northwest(),
+				this.south > otherRectangle.south ? southwest() : otherRectangle.southeast() };
+	}
+
+	/**
+	 * 判断高相等的传入矩形是否上相邻
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public boolean topTo(Rectangle otherRectangle) {
+		return this.west == otherRectangle.west && this.east == otherRectangle.east
+				&& this.north == otherRectangle.south;
+	}
+
+	/**
+	 * 得到两个上接壤矩形的接壤边
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public Point[] topIntersection(Rectangle otherRectangle) {
+		if (this.north != otherRectangle.south)
+			return null;
+		if (this.west > otherRectangle.east)
+			return null;
+		if (this.east < otherRectangle.west)
+			return null;
+		return new Point[] { this.west > otherRectangle.west ? northwest() : otherRectangle.southwest(),
+				this.east > otherRectangle.east ? otherRectangle.southeast() : northeast() };
+	}
+
+	/**
+	 * 判断高相等的传入矩形是否下相邻
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public boolean bottomTo(Rectangle otherRectangle) {
+		return this.west == otherRectangle.west && this.east == otherRectangle.east
+				&& this.south == otherRectangle.north;
+	}
+
+	/**
+	 * 得到两个下接壤矩形的接壤边
+	 * 
+	 * @param otherRectangle
+	 * @return
+	 */
+	public Point[] bottomIntersection(Rectangle otherRectangle) {
+		if (this.south != otherRectangle.north)
+			return null;
+		if (this.west > otherRectangle.east)
+			return null;
+		if (this.east < otherRectangle.west)
+			return null;
+		return new Point[] { this.west > otherRectangle.west ? southwest() : otherRectangle.northwest(),
+				this.east > otherRectangle.east ? otherRectangle.northeast() : southeast() };
 	}
 
 	/**
@@ -254,7 +367,7 @@ public class Rectangle {
 	}
 
 	/**
-	 * 合并两个长方形
+	 * 合并两个长方形 经纬度
 	 * 
 	 * @param rectangle
 	 * @param otherRectangle

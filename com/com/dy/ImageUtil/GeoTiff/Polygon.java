@@ -1,7 +1,7 @@
 package com.dy.ImageUtil.GeoTiff;
 
-public class Polygon {
-	private Point[] position;
+public class Polygon extends Config{
+	Point[] position;
 
 	public Polygon(double[] position) {
 		this(Point.fromArray(position));

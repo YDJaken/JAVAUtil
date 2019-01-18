@@ -14,11 +14,11 @@ public class MatrixUtil {
 	public static <T> T[][] generateMatrix(T[][] obj, Class<?> cla, T defalueValue) {
 		for (int i = 0; i < obj.length; i++) {
 			for (int j = 0; j < obj[i].length; j++) {
-//				if ((int) Math.round(Math.random()) == 0) {
-//					obj[i][j] = null;
-//				} else {
+				if ((int) Math.round(Math.random()) == 0) {
+					obj[i][j] = null;
+				} else {
 					obj[i][j] = defalueValue;
-//				}
+				}
 			}
 		}
 		return obj;
@@ -87,29 +87,6 @@ public class MatrixUtil {
 	}
 
 	public static void main(String[] args) {
-//		Double[][] a = { { 1.0, 20.0 }, { 30.0, 40.0 }, { 5.0, 10.0 }, { 10.0, 20.0 } };
-//		System.out.println(MatrixUtil.toString(MatrixUtil.matrixReshape(a, Double.class, 4, 1)));
-		
-		
-//		Integer[][] as = new Integer[50][50];
-//		as = MatrixUtil.generateMatrix(as, Integer.class, 1);
-//		StringBuilder ass = new StringBuilder();
-//		ass.append("--------------合并前-----------------\n");
-//		for (int i = 0; i < as.length; i++) {
-//			for (int j = 0; j < as[i].length; j++) {
-//				if (as[i][j] == null) {
-//					ass.append('*');
-//				} else {
-//					ass.append(as[i][j].toString());
-//				}
-//				if(j != as[i].length-1) {
-//					ass.append(',');
-//				}
-//			}
-//			ass.append("\n");
-//		}
-//		ass.append("--------------合并前-----------------\n");
-//		System.out.println(ass.toString());
 
 	}
 }

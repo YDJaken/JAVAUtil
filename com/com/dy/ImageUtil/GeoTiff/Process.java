@@ -4,29 +4,35 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Stack;
 
 import com.dy.Util.MatrixUtil;
 
-public class Process {
+public class Process extends Config {
 
 	private final Rectangle[][] matrix;
 
 	private int currentIndex = 0;
 
-	Process(Rectangle[][] matrix) {
+	private final Compare fatherThread;
+
+	Process(Rectangle[][] matrix, Compare fatherThread) {
 		this.matrix = matrix;
+		this.fatherThread = fatherThread;
 	}
 
-	Process(Rectangle[] rec, int row, int column) {
+	Process(Rectangle[] rec, int row, int column, Compare fatherThread) {
 		this((Rectangle[][]) MatrixUtil.matrixReshape(MatrixUtil.reformate(rec, Rectangle.class), Rectangle.class, row,
-				column));
+				column), fatherThread);
 	}
 
 	public void merge() {
 
 		findBorder();
 
-		//test();
+		// test();
+
+		sortBorder();
 
 	}
 
@@ -126,13 +132,6 @@ public class Process {
 		}
 	}
 
-	/**
-	 * 确定边界矩形
-	 * 
-	 * @param i     行号
-	 * @param j     列号
-	 * @param index 矩形所在的多边形的位置
-	 */
 	private void findBorder() {
 		for (int i = 0; i < matrix.length; i++) {
 			L1: for (int j = 0; j < matrix[i].length; j++) {
@@ -157,6 +156,13 @@ public class Process {
 		return findBorder(i, j, -1);
 	}
 
+	/**
+	 * 确定边界矩形
+	 * 
+	 * @param i     行号
+	 * @param j     列号
+	 * @param index 矩形所在的多边形的位置
+	 */
 	private int findBorder(int i, int j, int index) {
 		if (matrix[i][j] == null)
 			return -1;
@@ -233,7 +239,108 @@ public class Process {
 		}
 	}
 
+	private void sortBorder() {
+		LocationProjection lp = new LocationProjection();
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (matrix[i][j] == null) {
+					continue;
+				} else {
+					Rectangle target = matrix[i][j];
+					Object current = target.getConfig("bounder");
+					if (current == null) {
+						current = testIndside(i, j);
+					}
+					if ((boolean) current) {
+						lp.addRectangle((int) target.getConfig("RegionIndex"), target);
+					}
+				}
+			}
+		}
+		Integer[] indexs = lp.getAllIndex();
+		int ignoreElement = (int) fatherThread.getConfig("ignoreElementCount");
+		for (int i = 0; i < indexs.length; i++) {
+			Integer index = indexs[i];
+			if (lp.getSize(index) <= ignoreElement) {
+				lp.removeInteger(index);
+			} else {
+				transformPolygon(lp.getIndex(index));
+			}
+		}
+	}
+
+	private void transformPolygon(Stack<Rectangle> input) {
+		int size = input.size();
+		Stack<Polygon> stack = new Stack<>();
+		for (int i = 0; i < size; i++) {
+			Rectangle target = input.get(i);
+			if (i == 0) {
+				stack.push(new Polygon(target.toPointArray()));
+			} else {
+				if (testStack(stack, target)) {
+
+				} else {
+					stack.push(new Polygon(target.toPointArray()));
+				}
+			}
+		}
+	}
+
+	private boolean testStack(Stack<Polygon> stack, Rectangle target) {
+		for (int i = 0; i < stack.size(); i++) {
+			Polygon current = stack.get(i);
+			Point west = target.northwest(),east = target.northeast();
+			boolean northwest = current.contains(west);
+			boolean northeast = current.contains(east);
+			int left = -1, right = -1;
+			if (northwest) {
+
+			}
+			if (northeast) {
+
+			}
+			Point[] points = current.position;
+		}
+		return false;
+	}
+
+	private boolean testIndside(int i, int j) {
+		short finnded = 0;
+		try {
+			if (matrix[i - 1][j] != null) {
+				finnded++;
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		try {
+			if (matrix[i + 1][j] != null) {
+				finnded++;
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		try {
+			if (matrix[i][j - 1] != null) {
+				finnded++;
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		try {
+			if (matrix[i][j + 1] != null) {
+				finnded++;
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		if (finnded == 4) {
+			matrix[i][j].setConfig("bounder", false);
+			return false;
+		} else {
+			matrix[i][j].setConfig("bounder", true);
+			return true;
+		}
+	}
+
 	private int lookAround(int i, int j) {
+
 		int ret = -1;
 		try {
 			Rectangle top = matrix[i - 1][j];
@@ -294,7 +401,7 @@ public class Process {
 	public static void main(String[] args) {
 		Rectangle[][] as = new Rectangle[70][70];
 		as = (Rectangle[][]) MatrixUtil.generateMatrix(as, Rectangle.class, new Rectangle());
-		Process p = new Process(as);
+		Process p = new Process(as, new Compare());
 		p.merge();
 	}
 }

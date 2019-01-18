@@ -6,7 +6,7 @@ package com.dy.ImageUtil.GeoTiff;
  * @author dy
  *
  */
-public class Point {
+public class Point extends Config {
 	double x, longitude;
 	double y, latitude;
 
@@ -26,7 +26,7 @@ public class Point {
 	public Point copy() {
 		return new Point(this);
 	}
-
+	
 	public boolean equals(Point target) {
 		return equals(target, Coordinate.epsilon10);
 	}

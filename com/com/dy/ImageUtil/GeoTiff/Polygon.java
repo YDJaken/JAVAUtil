@@ -1,6 +1,6 @@
 package com.dy.ImageUtil.GeoTiff;
 
-public class Polygon extends Config{
+public class Polygon extends Config {
 	Point[] position;
 
 	public Polygon(double[] position) {
@@ -87,5 +87,22 @@ public class Polygon extends Config{
 				return true;
 		}
 		return false;
+	}
+
+	/**
+	 * 计算此多边形的包围矩形
+	 * 
+	 * @return {Rectangle}
+	 */
+	static Rectangle loadRectangle(Polygon target) {
+		double maxLon = Double.NEGATIVE_INFINITY, maxLat = Double.NEGATIVE_INFINITY, minLon = Double.POSITIVE_INFINITY,
+				minLat = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < target.position.length; i++) {
+			maxLon = Math.max(target.position[i].longitude, maxLon);
+			maxLat = Math.max(target.position[i].latitude, maxLat);
+			minLon = Math.min(target.position[i].longitude, minLon);
+			minLat = Math.min(target.position[i].latitude, minLat);
+		}
+		return new Rectangle(minLon, minLat, maxLon, maxLat);
 	}
 }

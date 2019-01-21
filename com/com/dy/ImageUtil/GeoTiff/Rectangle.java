@@ -8,9 +8,15 @@ public class Rectangle extends Config {
 	double north;
 	double width;
 	double height;
+	private boolean isImage = false;
 
 	public Rectangle() {
 		this(0, 0, 0, 0);
+	}
+
+	public Rectangle(int[] array) {
+		this(array[0], array[1], array[2], array[3],false);
+		this.isImage = true;
 	}
 
 	public Rectangle(double[] array) {
@@ -19,6 +25,11 @@ public class Rectangle extends Config {
 
 	public Rectangle(double[] array, boolean degree) {
 		this(array[0], array[1], array[2], array[3], degree);
+	}
+
+	public Rectangle(int west, int south, int east, int north) {
+		this(west, south, east, north, false);
+		this.isImage = true;
 	}
 
 	public Rectangle(double west, double south, double east, double north) {
@@ -106,7 +117,7 @@ public class Rectangle extends Config {
 	 * @return
 	 */
 	Point southwest() {
-		return new Point(this.west, this.south);
+		return isImage ? new Point(this.west, this.north) : new Point(this.west, this.south);
 	}
 
 	/**
@@ -116,7 +127,7 @@ public class Rectangle extends Config {
 	 * @return
 	 */
 	Point northwest() {
-		return new Point(this.west, this.north);
+		return isImage ? new Point(this.west, this.south) : new Point(this.west, this.north);
 	}
 
 	/**
@@ -126,7 +137,7 @@ public class Rectangle extends Config {
 	 * @return
 	 */
 	Point northeast() {
-		return new Point(this.east, this.north);
+		return isImage ? new Point(this.east, this.south) : new Point(this.east, this.north);
 	}
 
 	/**
@@ -136,7 +147,7 @@ public class Rectangle extends Config {
 	 * @return
 	 */
 	Point southeast() {
-		return new Point(this.east, this.south);
+		return isImage ? new Point(this.east, this.north) : new Point(this.east, this.south);
 	}
 
 	/**

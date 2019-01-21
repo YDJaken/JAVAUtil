@@ -18,8 +18,8 @@ public class Compare extends Config {
 
 	private Rectangle rectangle = new Rectangle(
 			new double[] { -Math.PI, -Coordinate.halfPI, Math.PI, Coordinate.halfPI });
-	private BufferedImage[] img1;
-	private BufferedImage[] img2;
+	BufferedImage[] img1;
+	BufferedImage[] img2;
 	private Rectangle[] imgBound;
 	private Thread[] subThreads;
 	Integer threadCount = 0;
@@ -61,9 +61,9 @@ public class Compare extends Config {
 		// 图片2起始对比高度位置
 		setConfig("startHeight2", 0);
 		// 每次对比的像素宽度
-		setConfig("pixelWidth", 5);
+		setConfig("pixelWidth", 25);
 		// 每次对比的像素高度
-		setConfig("pixelHeight", 5);
+		setConfig("pixelHeight", 25);
 		// 差异率阈值 (不同数大于此阈值算做有区别)
 		setConfig("flagRadio", 50.0);
 		// 设置最大线程数

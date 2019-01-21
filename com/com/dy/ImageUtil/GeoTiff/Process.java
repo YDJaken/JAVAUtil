@@ -1,11 +1,13 @@
 package com.dy.ImageUtil.GeoTiff;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Stack;
 
+import com.dy.ImageUtil.TiffUtil;
 import com.dy.Util.MatrixUtil;
 
 public class Process extends Config {
@@ -30,10 +32,26 @@ public class Process extends Config {
 
 		findBorder();
 
+		printBorder();
+
 		// test();
 
 		sortBorder();
 
+	}
+
+	private void printBorder() {
+		BufferedImage origin = fatherThread.img1[0];
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (matrix[i][j] != null) {
+					int index = (int) matrix[i][j].getConfig("RegionIndex");
+					int mode = index%10;
+					origin = ImageDrawUtil.drawRectangleOutline(origin, matrix[i][j], "#"+mode+"f"+mode+"f"+mode+"f");
+				}
+			}
+		}
+		TiffUtil.saveTif(origin, 0, "/data/DownLoad/001.tif", "/home/dy/Desktop/testImage/test");
 	}
 
 	/**
@@ -277,29 +295,142 @@ public class Process extends Config {
 			if (i == 0) {
 				stack.push(new Polygon(target.toPointArray()));
 			} else {
-				if (testStack(stack, target)) {
-
-				} else {
+				if (!testStack(stack, target))
 					stack.push(new Polygon(target.toPointArray()));
-				}
 			}
 		}
 	}
 
+	/**
+	 * 对比当前的合并多边形,如果传入矩形不与任何已存在的多边形相交 返回false
+	 * 
+	 * @param stack
+	 * @param target
+	 * @return
+	 */
 	private boolean testStack(Stack<Polygon> stack, Rectangle target) {
+		int count = 0;
 		for (int i = 0; i < stack.size(); i++) {
 			Polygon current = stack.get(i);
-			Point west = target.northwest(),east = target.northeast();
-			boolean northwest = current.contains(west);
-			boolean northeast = current.contains(east);
-			int left = -1, right = -1;
-			if (northwest) {
-
+			int[] left = { -1, -1 }, right = { -1, -1 }, outter = { -1, -1 };
+			Point[] points = current.position, recPoint = target.toPointArray();
+			Point west = recPoint[0], east = recPoint[1];
+			for (int j = points.length - 1; j >= 0; j--) {
+				int next = j == 0 ? points.length - 1 : j - 1;
+				if (right[0] != -1) {
+					if (west.equals(points[j])) {
+						left[0] = left[1] = j;
+					} else {
+						if (inLine(points[j], points[next], west)) {
+							left[0] = j;
+							left[1] = next;
+						}
+					}
+				}
+				if (left[0] != -1) {
+					if (east.equals(points[j])) {
+						right[0] = right[1] = j;
+					} else {
+						if (inLine(points[j], points[next], east)) {
+							right[0] = j;
+							right[1] = next;
+						}
+					}
+				}
+				if (inLine(east, west, points[j])) {
+					if (outter[0] == -1) {
+						outter[0] = j;
+					} else {
+						outter[1] = j;
+					}
+				}
+				if ((right[0] != -1 && left[0] != -1))
+					break;
 			}
-			if (northeast) {
-
+			Point[] bigger = new Point[points.length + 4];
+			if (outter[0] != -1 && outter[1] != -1) {
+				count++;
+				for (int j = 0, tureSize = 0, i_index = 0, max = outter[0], min = outter[1]; j < bigger.length; j++) {
+					if (i_index <= min || i_index >= max) {
+						bigger[j] = points[i_index++];
+					} else {
+						int pos = (j - min) + 1;
+						if (pos <= 4) {
+							if (pos == 4) {
+								bigger[j] = recPoint[0];
+								i_index = max;
+							}
+							bigger[j] = recPoint[pos];
+						}
+					}
+					tureSize++;
+					if (i_index == points.length) {
+						current.position = new Point[tureSize];
+						for (int k = 0; k < tureSize; k++) {
+							current.position[k] = bigger[k];
+						}
+						break;
+					}
+				}
+			} else if (left[0] != -1 && right[0] != -1) {
+				count++;
+				if (left[0] == left[1] && right[0] == right[1]) {
+					points[left[0]] = recPoint[2];
+					points[right[0]] = recPoint[3];
+				} else if (left[0] != left[1] && right[0] != right[1]) {
+					for (int j = 0, tureSize = 0, i_index = 0, max = left[1], min = right[0]; j < bigger.length; j++) {
+						if (i_index <= min || i_index >= max) {
+							bigger[j] = points[i_index++];
+						} else {
+							int pos = (j - min) + 1;
+							if (pos <= 4) {
+								if (pos == 4) {
+									bigger[j] = recPoint[0];
+									i_index = max;
+								}
+								bigger[j] = recPoint[pos];
+							}
+						}
+						tureSize++;
+						if (i_index == points.length) {
+							current.position = new Point[tureSize];
+							for (int k = 0; k < tureSize; k++) {
+								current.position[k] = bigger[k];
+							}
+							break;
+						}
+					}
+				} else if (left[0] != left[1]) {
+					// TODO 当右上角点与多边形的顶点相同时的逻辑
+				} else if (right[0] != right[1]) {
+					// TODO 当左上角点与多边形的顶点相同时的逻辑
+				}
+			} else if (left[0] == -1 && right[0] != -1) {
+				count++;
+				// TODO 当传入矩形只有左上角点在顶点或者边上时的逻辑
+			} else if (left[0] != -1 && right[0] == -1) {
+				count++;
+				// TODO 当传入矩形只有右上角点在顶点或者边上时的逻辑
 			}
-			Point[] points = current.position;
+
+		}
+		if (count > 0) {
+			// TODO 缺少多边形合并逻辑
+		}
+		return count > 0;
+	}
+
+	/**
+	 * 单纯矩形线判断点是否在线上
+	 * 
+	 * @param first
+	 * @param second
+	 * @param target
+	 * @return
+	 */
+	private boolean inLine(Point first, Point second, Point target) {
+		if (first.y == second.y && target.y == second.y) {
+			return target.x >= Math.min(first.x, second.x) && target.x <= Math.max(first.x, second.x);
 		}
 		return false;
 	}

@@ -20,10 +20,30 @@ class RectangleUnitTest {
 
 	@Test
 	void test() {
+		assertEquals(middle.rightTo(middle), false);
+		assertEquals(middle.leftTo(middle), false);
+		assertEquals(middle.topTo(middle), false);
+		assertEquals(middle.bottomTo(middle), false);
+		
 		assertEquals(middle.rightTo(right), true);
+		assertEquals(middle.leftTo(right), false);
+		assertEquals(middle.topTo(right), false);
+		assertEquals(middle.bottomTo(right), false);
+
 		assertEquals(middle.leftTo(left), true);
+		assertEquals(middle.rightTo(left), false);
+		assertEquals(middle.topTo(left), false);
+		assertEquals(middle.bottomTo(left), false);
+
 		assertEquals(middle.topTo(top), true);
+		assertEquals(middle.rightTo(top), false);
+		assertEquals(middle.leftTo(top), false);
+		assertEquals(middle.bottomTo(top), false);
+
 		assertEquals(middle.bottomTo(bottom), true);
+		assertEquals(middle.rightTo(bottom), false);
+		assertEquals(middle.leftTo(bottom), false);
+		assertEquals(middle.topTo(bottom), false);
 	}
 
 	@Test

@@ -58,8 +58,8 @@ public class ImageDrawUtil extends ImageUtill {
 		Point[] arr = rec.toPointArray();
 		target = ImageDrawUtil.drawLine(target, arr[0], arr[1], color);
 		target = ImageDrawUtil.drawLine(target, arr[1], arr[2], color);
-//		target = ImageDrawUtil.drawLine(target, arr[2], arr[3], color);
-//		target = ImageDrawUtil.drawLine(target, arr[0], arr[3], color);
+		target = ImageDrawUtil.drawLine(target, arr[2], arr[3], color);
+		target = ImageDrawUtil.drawLine(target, arr[0], arr[3], color);
 		return target;
 	}
 
@@ -130,7 +130,7 @@ public class ImageDrawUtil extends ImageUtill {
 		BufferedImage origin = TiffUtil.loadTiff(imgurl)[0];
 		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(10, 200), "#ff0000");
 		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(100, 50), "#ffff00");
-		origin = ImageDrawUtil.drawRectangleOutline(origin, new Rectangle(20, 50, 100, 200), "#ff00ff");
+		origin = ImageDrawUtil.drawRectangleOutline(origin, new Rectangle(200, 500, 1000, 2000), "#ff00ff");
 //		origin = ImageDrawUtil.drawPolygonOutline(origin, new Polygon(new double[] {10.0,20.0,10.0,30.0,200.0,30.0,10.0,30.0}),"#121212");
 		TiffUtil.saveTif(origin, 0, imgurl, output + "test");
 	}

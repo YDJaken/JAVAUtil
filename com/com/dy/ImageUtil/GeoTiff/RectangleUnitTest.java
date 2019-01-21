@@ -58,58 +58,58 @@ class RectangleUnitTest {
 	}
 
 	@Test
-	void testTopIntersection() {
-		Rectangle topMore = new Rectangle(-lenght, lenght, lenght, lenght * 2);
-		Point[] ret = middle.topIntersection(topMore);
-		assertEquals(ret[0].equals(middle.northwest()), true);
-		assertEquals(ret[1].equals(middle.northeast()), true);
-		Rectangle topLess = new Rectangle(lenght / 4, lenght, lenght / 2, lenght * 2);
-		ret = middle.topIntersection(topLess);
-		assertEquals(ret[0].equals(topLess.southwest()), true);
-		assertEquals(ret[1].equals(topLess.southeast()), true);
-		Rectangle top1 = new Rectangle(0, lenght, lenght * 2, lenght * 2);
-		ret = middle.topIntersection(top1);
-		assertEquals(ret[0].equals(top1.southwest()), true);
-		assertEquals(ret[0].equals(middle.northwest()), true);
-		assertEquals(ret[1].equals(middle.northeast()), true);
-		Rectangle top2 = new Rectangle(-lenght, lenght, lenght, lenght * 2);
-		ret = middle.topIntersection(top2);
-		assertEquals(ret[0].equals(middle.northwest()), true);
-		assertEquals(ret[1].equals(top2.southeast()), true);
-		assertEquals(ret[1].equals(middle.northeast()), true);
-		Rectangle topUntouch1 = new Rectangle(-lenght * 2, lenght, -lenght, lenght * 2);
-		ret = middle.topIntersection(topUntouch1);
-		assertEquals(ret == null, true);
-		Rectangle topUntouch2 = new Rectangle(lenght * 2, lenght, lenght * 3, lenght * 2);
-		ret = middle.topIntersection(topUntouch2);
-		assertEquals(ret == null, true);
-	}
-
-	@Test
 	void testBottomIntersection() {
-		Rectangle bottomMore = new Rectangle(-lenght, -lenght, lenght, 0);
+		Rectangle bottomMore = new Rectangle(-lenght, lenght, lenght, lenght * 2);
 		Point[] ret = middle.bottomIntersection(bottomMore);
 		assertEquals(ret[0].equals(middle.southwest()), true);
 		assertEquals(ret[1].equals(middle.southeast()), true);
-		Rectangle bottomLess = new Rectangle(lenght / 4, -lenght, lenght / 2, 0);
+		Rectangle bottomLess = new Rectangle(lenght / 4, lenght, lenght / 2, lenght * 2);
 		ret = middle.bottomIntersection(bottomLess);
 		assertEquals(ret[0].equals(bottomLess.northwest()), true);
 		assertEquals(ret[1].equals(bottomLess.northeast()), true);
-		Rectangle bottom1 = new Rectangle(0, -lenght, lenght * 2, 0);
+		Rectangle bottom1 = new Rectangle(0, lenght, lenght * 2, lenght * 2);
 		ret = middle.bottomIntersection(bottom1);
 		assertEquals(ret[0].equals(bottom1.northwest()), true);
 		assertEquals(ret[0].equals(middle.southwest()), true);
 		assertEquals(ret[1].equals(middle.southeast()), true);
-		Rectangle bottom2 = new Rectangle(-lenght, -lenght, lenght, 0);
+		Rectangle bottom2 = new Rectangle(-lenght, lenght, lenght, lenght * 2);
 		ret = middle.bottomIntersection(bottom2);
 		assertEquals(ret[0].equals(middle.southwest()), true);
 		assertEquals(ret[1].equals(bottom2.northeast()), true);
 		assertEquals(ret[1].equals(middle.southeast()), true);
-		Rectangle bottomUntouch1 = new Rectangle(-lenght * 2, -lenght, -lenght, 0);
+		Rectangle bottomUntouch1 = new Rectangle(-lenght * 2, lenght, -lenght, lenght * 2);
 		ret = middle.bottomIntersection(bottomUntouch1);
 		assertEquals(ret == null, true);
-		Rectangle bottomUntouch2 = new Rectangle(lenght * 2, -lenght, lenght * 3, 0);
+		Rectangle bottomUntouch2 = new Rectangle(lenght * 2, lenght, lenght * 3, lenght * 2);
 		ret = middle.bottomIntersection(bottomUntouch2);
+		assertEquals(ret == null, true);
+	}
+
+	@Test
+	void testTopIntersection() {
+		Rectangle topMore = new Rectangle(-lenght, -lenght, lenght, 0);
+		Point[] ret = middle.topIntersection(topMore);
+		assertEquals(ret[0].equals(middle.northwest()), true);
+		assertEquals(ret[1].equals(middle.northeast()), true);
+		Rectangle topLess = new Rectangle(lenght / 4, -lenght, lenght / 2, 0);
+		ret = middle.topIntersection(topLess);
+		assertEquals(ret[0].equals(topLess.southwest()), true);
+		assertEquals(ret[1].equals(topLess.southeast()), true);
+		Rectangle top1 = new Rectangle(0, -lenght, lenght * 2, 0);
+		ret = middle.topIntersection(top1);
+		assertEquals(ret[0].equals(top1.southwest()), true);
+		assertEquals(ret[0].equals(middle.northwest()), true);
+		assertEquals(ret[1].equals(middle.northeast()), true);
+		Rectangle top2 = new Rectangle(-lenght, -lenght, lenght, 0);
+		ret = middle.topIntersection(top2);
+		assertEquals(ret[0].equals(middle.northwest()), true);
+		assertEquals(ret[1].equals(top2.southeast()), true);
+		assertEquals(ret[1].equals(middle.northeast()), true);
+		Rectangle topUntouch1 = new Rectangle(-lenght * 2, -lenght, -lenght, 0);
+		ret = middle.topIntersection(topUntouch1);
+		assertEquals(ret == null, true);
+		Rectangle topUntouch2 = new Rectangle(lenght * 2, -lenght, lenght * 3, 0);
+		ret = middle.topIntersection(topUntouch2);
 		assertEquals(ret == null, true);
 	}
 
@@ -126,12 +126,12 @@ class RectangleUnitTest {
 		Rectangle right1 = new Rectangle(lenght, 0, lenght * 2, lenght * 2);
 		ret = middle.rightIntersection(right1);
 		assertEquals(ret[0].equals(middle.northeast()), true);
-		assertEquals(ret[1].equals(right1.southwest()), true);
+		assertEquals(ret[0].equals(right1.northwest()), true);
 		assertEquals(ret[1].equals(middle.southeast()), true);
 		Rectangle right2 = new Rectangle(lenght, -lenght, lenght * 2, lenght);
 		ret = middle.rightIntersection(right2);
 		assertEquals(ret[0].equals(middle.northeast()), true);
-		assertEquals(ret[0].equals(right2.northwest()), true);
+		assertEquals(ret[1].equals(right2.southwest()), true);
 		assertEquals(ret[1].equals(middle.southeast()), true);
 		Rectangle rightUntouch1 = new Rectangle(lenght * 2, 0, lenght * 3, lenght);
 		ret = middle.rightIntersection(rightUntouch1);
@@ -154,12 +154,12 @@ class RectangleUnitTest {
 		Rectangle left1 = new Rectangle(-lenght, 0, 0, lenght * 2);
 		ret = middle.leftIntersection(left1);
 		assertEquals(ret[0].equals(middle.northwest()), true);
-		assertEquals(ret[1].equals(left1.southeast()), true);
+		assertEquals(ret[0].equals(left1.northeast()), true);
 		assertEquals(ret[1].equals(middle.southwest()), true);
 		Rectangle left2 = new Rectangle(-lenght, -lenght, 0, lenght);
 		ret = middle.leftIntersection(left2);
 		assertEquals(ret[0].equals(middle.northwest()), true);
-		assertEquals(ret[0].equals(left2.northeast()), true);
+		assertEquals(ret[1].equals(left2.southeast()), true);
 		assertEquals(ret[1].equals(middle.southwest()), true);
 		Rectangle leftUntouch1 = new Rectangle(lenght * 2, 0, lenght * 3, lenght);
 		ret = middle.leftIntersection(leftUntouch1);

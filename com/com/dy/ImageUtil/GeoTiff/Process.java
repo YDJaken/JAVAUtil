@@ -12,6 +12,7 @@ import com.dy.Util.MatrixUtil;
 
 public class Process extends Config {
 
+	private final String[] color = {"#FFB6C1","#FFFF00","#99FF00","#9999FF","#FF6600","#990000","#0000FF","#33CCFF","#FF9966","#00FF33"};
 	private final Rectangle[][] matrix;
 
 	private int currentIndex = 0;
@@ -46,8 +47,8 @@ public class Process extends Config {
 			for (int j = 0; j < matrix[i].length; j++) {
 				if (matrix[i][j] != null) {
 					int index = (int) matrix[i][j].getConfig("RegionIndex");
-					int mode = index%10;
-					origin = ImageDrawUtil.drawRectangleOutline(origin, matrix[i][j], "#"+mode+"f"+mode+"f"+mode+"f");
+					int mode = index % 10;
+					origin = ImageDrawUtil.drawRectangleOutline(origin, matrix[i][j], color[mode]);
 				}
 			}
 		}
@@ -402,6 +403,7 @@ public class Process extends Config {
 					}
 				} else if (left[0] != left[1]) {
 					// TODO 当右上角点与多边形的顶点相同时的逻辑
+					
 				} else if (right[0] != right[1]) {
 					// TODO 当左上角点与多边形的顶点相同时的逻辑
 				}

@@ -15,7 +15,7 @@ public class Rectangle extends Config {
 	}
 
 	public Rectangle(int[] array) {
-		this(array[0], array[1], array[2], array[3],false);
+		this(array[0], array[1], array[2], array[3], false);
 		this.isImage = true;
 	}
 
@@ -222,18 +222,17 @@ public class Rectangle extends Config {
 	/**
 	 * 得到两个右接壤矩形的接壤边
 	 * 
-	 * @param otherRectangle
+	 * @param otherRectangle (在本矩形右边)
 	 * @return
 	 */
 	public Point[] rightIntersection(Rectangle otherRectangle) {
-		if (this.east != otherRectangle.west)
+		if (this.east != otherRectangle.west || this.south > otherRectangle.north || this.north < otherRectangle.south)
 			return null;
-		if (this.south > otherRectangle.north)
-			return null;
-		if (this.north < otherRectangle.south)
-			return null;
-		return new Point[] { this.north > otherRectangle.north ? otherRectangle.northwest() : northeast(),
-				this.south > otherRectangle.south ? southeast() : otherRectangle.southwest() };
+		return isImage
+				? new Point[] { this.south > otherRectangle.south ? northeast() : otherRectangle.northwest(),
+						this.north > otherRectangle.north ? otherRectangle.southwest() : southeast() }
+				: new Point[] { this.north > otherRectangle.north ? otherRectangle.northwest() : northeast(),
+						this.south > otherRectangle.south ? southeast() : otherRectangle.southwest() };
 	}
 
 	/**
@@ -250,18 +249,17 @@ public class Rectangle extends Config {
 	/**
 	 * 得到两个左接壤矩形的接壤边
 	 * 
-	 * @param otherRectangle
+	 * @param otherRectangle (在本矩形左边)
 	 * @return
 	 */
 	public Point[] leftIntersection(Rectangle otherRectangle) {
-		if (this.west != otherRectangle.east)
+		if (this.west != otherRectangle.east || this.south > otherRectangle.north || this.north < otherRectangle.south)
 			return null;
-		if (this.south > otherRectangle.north)
-			return null;
-		if (this.north < otherRectangle.south)
-			return null;
-		return new Point[] { this.north > otherRectangle.north ? otherRectangle.northeast() : northwest(),
-				this.south > otherRectangle.south ? southwest() : otherRectangle.southeast() };
+		return isImage
+				? new Point[] { this.south < otherRectangle.south ? otherRectangle.northeast() : northwest(),
+						this.north < otherRectangle.north ? southwest() : otherRectangle.southeast() }
+				: new Point[] { this.north > otherRectangle.north ? otherRectangle.northeast() : northwest(),
+						this.south > otherRectangle.south ? southwest() : otherRectangle.southeast() };
 	}
 
 	/**
@@ -278,15 +276,18 @@ public class Rectangle extends Config {
 	/**
 	 * 得到两个上接壤矩形的接壤边
 	 * 
-	 * @param otherRectangle
+	 * @param otherRectangle (在本矩形上边)
 	 * @return
 	 */
 	public Point[] topIntersection(Rectangle otherRectangle) {
-		if (this.north != otherRectangle.south)
-			return null;
-		if (this.west > otherRectangle.east)
-			return null;
-		if (this.east < otherRectangle.west)
+		if (isImage) {
+			if (this.south != otherRectangle.north)
+				return null;
+		} else {
+			if (this.north != otherRectangle.south)
+				return null;
+		}
+		if (this.west > otherRectangle.east || this.east < otherRectangle.west)
 			return null;
 		return new Point[] { this.west > otherRectangle.west ? northwest() : otherRectangle.southwest(),
 				this.east > otherRectangle.east ? otherRectangle.southeast() : northeast() };
@@ -306,15 +307,18 @@ public class Rectangle extends Config {
 	/**
 	 * 得到两个下接壤矩形的接壤边
 	 * 
-	 * @param otherRectangle
+	 * @param otherRectangle (在本矩形下边)
 	 * @return
 	 */
 	public Point[] bottomIntersection(Rectangle otherRectangle) {
-		if (this.south != otherRectangle.north)
-			return null;
-		if (this.west > otherRectangle.east)
-			return null;
-		if (this.east < otherRectangle.west)
+		if (isImage) {
+			if (this.north != otherRectangle.south)
+				return null;
+		} else {
+			if (this.south != otherRectangle.north)
+				return null;
+		}
+		if (this.east < otherRectangle.west || this.west > otherRectangle.east)
 			return null;
 		return new Point[] { this.west > otherRectangle.west ? southwest() : otherRectangle.northwest(),
 				this.east > otherRectangle.east ? otherRectangle.northeast() : southeast() };

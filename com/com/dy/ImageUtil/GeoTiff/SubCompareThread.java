@@ -29,7 +29,7 @@ public class SubCompareThread extends Thread {
 				.getConfig("compareColumn")];
 		for (int i = 0; i < ret.length - 1; i++) {
 			for (int j = 0; j < ret[i].length - 1; j++) {
-				ret[i][j] = new Rectangle(j * pixelWidth, i * pixelHeight, (j + 1) * pixelWidth, (i + 1) * pixelHeight);
+				ret[i][j] = new Rectangle((int)(j * pixelWidth), (int)(i * pixelHeight),(int)((j + 1) * pixelWidth), (int)((i + 1) * pixelHeight));
 			}
 		}
 		return ret;

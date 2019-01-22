@@ -8,7 +8,7 @@ public class Rectangle extends Config {
 	double north;
 	double width;
 	double height;
-	private boolean isImage = false;
+	boolean isImage = false;
 
 	public Rectangle() {
 		this(0, 0, 0, 0);
@@ -352,11 +352,13 @@ public class Rectangle extends Config {
 	static Rectangle simpleUnion(Rectangle rectangle, Rectangle otherRectangle) {
 		if (!Rectangle.nextTo(rectangle, otherRectangle))
 			return null;
+		boolean img = rectangle.isImage && otherRectangle.isImage;
 		double west = Math.min(rectangle.west, otherRectangle.west),
 				south = Math.min(rectangle.south, otherRectangle.south),
 				east = Math.max(rectangle.east, otherRectangle.east),
 				north = Math.max(rectangle.north, otherRectangle.north);
-		return new Rectangle(west, south, east, north);
+		return img ? new Rectangle((int) west, (int) south, (int) east, (int) north)
+				: new Rectangle(west, south, east, north);
 	}
 
 	/**

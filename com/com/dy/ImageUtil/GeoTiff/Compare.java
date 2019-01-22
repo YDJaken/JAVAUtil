@@ -190,9 +190,9 @@ public class Compare extends Config {
 
 	}
 
-	// 将图片坐标的矩阵转换为经纬度或者传入坐标系
+	// TODO 将图片坐标的矩阵转换为经纬度或者传入坐标系
 	private void transformCoordinate() {
-
+		
 	}
 
 	// 计算图片被切分的矩阵行列数
@@ -216,7 +216,7 @@ public class Compare extends Config {
 		double areaPerElement = ((double) getConfig("realWorldWidthDelta") * pixelWidth)
 				* ((double) getConfig("realWorldHeightDelta") * pixelHeight);
 		// 忽略的单元格子数
-		setConfig("ignoreElementCount",(int)Math.round((int)getConfig("ignoreArea")/areaPerElement));
+		setConfig("ignoreElementCount",(int)Math.ceil((int)getConfig("ignoreArea")/areaPerElement));
 	}
 
 	/**

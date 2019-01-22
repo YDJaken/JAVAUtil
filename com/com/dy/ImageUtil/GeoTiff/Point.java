@@ -55,9 +55,9 @@ public class Point extends Config {
 
 	public static Point[] fromArray(double[] input) {
 		Point[] ret = new Point[input.length / 2];
-		for (int i = 0; i < ret.length; i++) {
-			int startPosition = i * 2;
-			ret[i] = new Point(input[startPosition], input[startPosition++]);
+		int position = 0;
+		for (int i = 0; i < input.length; i++) {
+			ret[position++] = new Point(input[i], input[++i]);
 		}
 		return ret;
 	}

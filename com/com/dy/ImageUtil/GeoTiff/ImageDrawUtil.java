@@ -128,10 +128,10 @@ public class ImageDrawUtil extends ImageUtill {
 			}
 		}
 		BufferedImage origin = TiffUtil.loadTiff(imgurl)[0];
-		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(10, 200), "#ff0000");
-		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(100, 50), "#ffff00");
-		origin = ImageDrawUtil.drawRectangleOutline(origin, new Rectangle(200, 500, 1000, 2000), "#ff00ff");
-//		origin = ImageDrawUtil.drawPolygonOutline(origin, new Polygon(new double[] {10.0,20.0,10.0,30.0,200.0,30.0,10.0,30.0}),"#121212");
+//		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(10, 200), "#ff0000");
+//		origin = ImageDrawUtil.drawLine(origin, new Point(10, 50), new Point(100, 50), "#ffff00");
+//		origin = ImageDrawUtil.drawRectangleOutline(origin, new Rectangle(200, 500, 1000, 2000), "#ff00ff");
+		origin = ImageDrawUtil.drawPolygonOutline(origin, new Polygon(new double[] {825,25,850,25,850,50,825,50}),"#ff12ff");
 		TiffUtil.saveTif(origin, 0, imgurl, output + "test");
 	}
 }

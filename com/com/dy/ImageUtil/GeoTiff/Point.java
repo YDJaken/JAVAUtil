@@ -26,7 +26,7 @@ public class Point extends Config {
 	public Point copy() {
 		return new Point(this);
 	}
-	
+
 	public boolean equals(Point target) {
 		return equals(target, Coordinate.epsilon10);
 	}
@@ -60,5 +60,10 @@ public class Point extends Config {
 			ret[position++] = new Point(input[i], input[++i]);
 		}
 		return ret;
+	}
+
+	@Override
+	public String toString() {
+		return "2DPoint:{x:" + x + ",y:" + y + "},geographical:{longitude:" + longitude + "latitude:" + latitude + "}";
 	}
 }

@@ -105,4 +105,15 @@ public class Polygon extends Config {
 		}
 		return new Rectangle(minLon, minLat, maxLon, maxLat);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		ret.append("Polygon:{").append("\n");
+		for (int i = 0; i < position.length; i++) {
+			ret.append(position[i].toString()).append("\n");
+		}
+		ret.append("}");
+		return ret.toString();
+	}
 }

@@ -588,10 +588,13 @@ public class Process extends Config {
 					}
 				}
 			}
-
 		}
-		if (count > 0) {
+		if (count > 1) {
 			// TODO 缺少多边形合并逻辑
+			System.out.println(count);
+			for (int i = 0; i < stack.size(); i++) {
+				System.out.println(stack.get(i));
+			}
 		}
 		return count > 0;
 	}

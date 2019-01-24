@@ -64,6 +64,6 @@ public class Point extends Config {
 
 	@Override
 	public String toString() {
-		return "2DPoint:{x:" + x + ",y:" + y + "},geographical:{longitude:" + longitude + "latitude:" + latitude + "}";
+		return x + "," + y;
 	}
 }

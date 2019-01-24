@@ -1,7 +1,10 @@
 package com.dy.ImageUtil.GeoTiff;
 
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Stack;
+
+import com.dy.ImageUtil.TiffUtil;
 
 public class LocationProjection extends Config {
 	private HashSet<Integer> set;
@@ -54,6 +57,24 @@ public class LocationProjection extends Config {
 		set.remove(input);
 		removeConfig(input.toString());
 		removeConfig(input.toString() + "size");
+	}
+
+	public void printRectangle() {
+		String imgurl = "/data/DownLoad/001.tif";
+		BufferedImage origin = TiffUtil.loadTiff(imgurl)[0];
+		Integer[] a = getAllIndex();
+		for (int i = 0; i < a.length; i++) {
+			Integer as = a[i];
+			if(as == 17) {
+				System.out.println();
+			}
+			String colorStr = Process.color[as%10];
+			Stack<Rectangle> tmp = getIndex(as);
+			for (int j = 0; j < tmp.size(); j++) {
+				origin = ImageDrawUtil.drawRectangleOutline(origin, tmp.get(j), colorStr);
+			}
+		}
+		TiffUtil.saveTif(origin, 0, "/data/DownLoad/001.tif", "/home/dy/Desktop/testImage/testMergedRec");
 	}
 
 	public String toString() {

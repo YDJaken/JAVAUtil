@@ -63,8 +63,8 @@ public class Rectangle extends Config {
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		b.append("Rectangle:{west:").append(west).append(",south:").append(south).append(",east:").append(east)
-				.append(",north:").append(north).append('}');
+		b.append("Rectangle:{").append(west).append(",").append(south).append(",").append(east)
+				.append(",").append(north).append('}');
 		return b.toString();
 	}
 

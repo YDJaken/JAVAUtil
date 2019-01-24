@@ -292,11 +292,11 @@ public class Compare extends Config {
 	}
 
 	public static void main(String[] args) {
-		Compare a = new Compare(90.82141185464081,45.0769349657265, 93.97137099423514, 47.032121099508096,
+		Compare a = new Compare(90.82141185464081, 45.0769349657265, 93.97137099423514, 47.032121099508096,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
-			Polygon[] as =  a.compare();
-			for(int i = 0; i< as.length;i++) {
+			Polygon[] as = a.compare();
+			for (int i = 0; i < as.length; i++) {
 				System.out.println(as[i].toString());
 			}
 		} catch (InterruptedException e) {

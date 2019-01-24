@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/LocationProjection.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/LocationProjection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/PolygonTester.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/PolygonTester.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Process.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Process.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/ProcessUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/ProcessUnitTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Rectangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/GeoTiff/Rectangle.java" afterDir="false" />
-    </list>
+    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -43,17 +36,7 @@
     <panes>
       <pane id="Scope" />
       <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="JavaUtil" type="b2602c69:ProjectViewProjectNode" />
-              <item name="JavaUtil" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -100,17 +83,17 @@
       <workItem from="1548150317465" duration="28000" />
       <workItem from="1548150489012" duration="61000" />
       <workItem from="1548292451270" duration="76000" />
-      <workItem from="1548302593971" duration="600000" />
+      <workItem from="1548302593971" duration="1228000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5197000" />
+    <option name="totallyTimeSpent" value="5825000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="-2" width="1920" height="1082" extended-state="7" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2950907" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2950907" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -127,7 +110,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.32004198" />
+      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.32004198" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />

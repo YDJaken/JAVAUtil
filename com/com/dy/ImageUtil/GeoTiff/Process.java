@@ -43,7 +43,7 @@ public class Process extends Config {
 
 		findBorder();
 
-		printBorder();
+		// printBorder();
 
 		// test();
 
@@ -51,6 +51,7 @@ public class Process extends Config {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void printBorder() {
 		BufferedImage origin = fatherThread.img1[0];
 		for (int i = 0; i < matrix.length; i++) {
@@ -299,7 +300,7 @@ public class Process extends Config {
 				}
 			}
 		}
-		lp.printRectangle();
+//		lp.printRectangle();
 		Integer[] indexs = lp.getAllIndex();
 		int ignoreElement = (int) fatherThread.getConfig("ignoreElementCount");
 		Stack<Polygon> all = new Stack<Polygon>();
@@ -317,10 +318,11 @@ public class Process extends Config {
 			}
 		}
 		fatherThread.setConfig("CompareRsult", all.toArray(new Polygon[all.size()]));
-		printPolygon(all, -1);
-		
+//		printPolygon(all, -1);
+
 	}
 
+	@SuppressWarnings("unused")
 	private void printPolygon(Stack<Polygon> target, int index) {
 		BufferedImage origin = fatherThread.img1[0];
 		if (index == -1) {
@@ -731,7 +733,7 @@ public class Process extends Config {
 	static Polygon mergePolygon(Polygon one, Polygon two, Rectangle rec) {
 		Polygon right, left;
 		int[] rightIndex = Process.findIndex(one, rec), leftIndex = Process.findIndex(two, rec), tmpIndex = rightIndex;
-		if (rightIndex[2] == 1 || one.position[rightIndex[0]-1].x >= one.position[rightIndex[0]].x) {
+		if (rightIndex[2] == 1 || one.position[rightIndex[0] - 1].x >= one.position[rightIndex[0]].x) {
 			right = two;
 			left = one;
 			rightIndex = leftIndex;
@@ -793,7 +795,7 @@ public class Process extends Config {
 	 * @return
 	 */
 	static int[] findIndex(Point start, Point end, Polygon left) {
-		int[] ret = new int[] {-1,-1};
+		int[] ret = new int[] { -1, -1 };
 		for (int i = 0; i < left.position.length; i++) {
 			int next = -1;
 			if (i == left.position.length - 1) {
@@ -804,10 +806,10 @@ public class Process extends Config {
 			if (Process.inLine(left.position[i], left.position[next], start)) {
 				ret[0] = i;
 			}
-			if(Process.inLine(left.position[i], left.position[next], end)) {
+			if (Process.inLine(left.position[i], left.position[next], end)) {
 				ret[1] = next;
 			}
-			if(ret[0]!= -1 && ret[1] != -1) 
+			if (ret[0] != -1 && ret[1] != -1)
 				return ret;
 		}
 		return ret;

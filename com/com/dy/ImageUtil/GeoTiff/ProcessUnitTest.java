@@ -53,8 +53,7 @@ class ProcessUnitTest {
 	// 下左含
 	@Test
 	void test3() {
-		Point[] result = Point
-				.fromArray(new double[] { 850, 50, 1000, 50, 1000, 75, 900, 75, 900, 100, 850, 100});
+		Point[] result = Point.fromArray(new double[] { 850, 50, 1000, 50, 1000, 75, 900, 75, 900, 100, 850, 100 });
 		Polygon target = new Polygon(new Rectangle(850, 50, 1000, 75).toPointArray());
 		Stack<Polygon> tt = new Stack<Polygon>();
 		tt.push(target);
@@ -92,7 +91,7 @@ class ProcessUnitTest {
 	// 下左包
 	@Test
 	void test5() {
-		Point[] result = Point.fromArray(new double[] { 850, 50, 1000, 50, 1000, 75, 1100, 75, 1100, 100, 850, 100 });
+		Point[] result = Point.fromArray(new double[] { 850.0,50.0,1000.0,50.0,1000.0,75.0,1100.0,75.0,1100.0,100.0,850.0,100.0,850.0,75.0 });
 		Polygon target = new Polygon(new Rectangle(850, 50, 1000, 75).toPointArray());
 		Stack<Polygon> tt = new Stack<Polygon>();
 		tt.push(target);
@@ -131,7 +130,7 @@ class ProcessUnitTest {
 	// 下右包
 	@Test
 	void test7() {
-		Point[] result = Point.fromArray(new double[] { 850, 50, 1000, 50, 1000, 100, 825, 100, 825, 75, 850, 75 });
+		Point[] result = Point.fromArray(new double[] {850.0,50.0,1000.0,50.0,1000.0,75.0,1000.0,100.0,825.0,100.0,825.0,75.0,850.0,75.0 });
 		Polygon target = new Polygon(new Rectangle(850, 50, 1000, 75).toPointArray());
 		Stack<Polygon> tt = new Stack<Polygon>();
 		tt.push(target);
@@ -208,5 +207,4 @@ class ProcessUnitTest {
 		TiffUtil.saveTif(origin, 0, "/data/DownLoad/001.tif", "/home/dy/Desktop/testImage/testBotCase10");
 	}
 
-	
 }

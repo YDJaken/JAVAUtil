@@ -24,7 +24,6 @@ public class Compare extends Config {
 	private Thread[] subThreads;
 	Integer threadCount = 0;
 	private ProtectThread pt;
-	
 
 	public Rectangle getRectangle() {
 		return rectangle;
@@ -75,7 +74,7 @@ public class Compare extends Config {
 		// 当前线程达到的Index(如果总线程数大于页数时此值总为0)
 		setConfig("currentIndex", 0);
 		// 是否需要将图片坐标转为传入坐标
-		setConfig("needTransform", false);
+		setConfig("needTransform", true);
 		// 忽略面积 单位 m^2
 		setConfig("ignoreArea", 5000);
 	}
@@ -190,9 +189,34 @@ public class Compare extends Config {
 
 	}
 
-	// TODO 将图片坐标的矩阵转换为经纬度或者传入坐标系
 	private void transformCoordinate() {
-		
+		Polygon[] target = changeCoordinate((Polygon[]) getConfig("CompareRsult"));
+		setConfig("CompareRsult", target);
+	}
+
+	private Polygon[] changeCoordinate(Polygon[] input) {
+		for (int i = 0; i < input.length; i++) {
+			input[i] = changeCoordinate(input[i]);
+		}
+		return input;
+	}
+
+	private Polygon changeCoordinate(Polygon input) {
+		for (int i = 0; i < input.position.length; i++) {
+			input.position[i] = changeCoordinate(input.position[i]);
+		}
+		return input;
+	}
+
+	private Point changeCoordinate(Point input) {
+		// 宽度像素变化对应的经度变化
+		double longtitude = (double) getConfig("longtitudeDelta");
+		// 高度像素变化对应的纬度变化
+		double latitude = (double) getConfig("latitudeDelta");
+		Point start = rectangle.northwest();
+		input.setLatitude(start.y - (latitude * input.y));
+		input.setLongitude(longtitude * input.x + start.x);
+		return input;
 	}
 
 	// 计算图片被切分的矩阵行列数
@@ -216,7 +240,7 @@ public class Compare extends Config {
 		double areaPerElement = ((double) getConfig("realWorldWidthDelta") * pixelWidth)
 				* ((double) getConfig("realWorldHeightDelta") * pixelHeight);
 		// 忽略的单元格子数
-		setConfig("ignoreElementCount",(int)Math.ceil((int)getConfig("ignoreArea")/areaPerElement));
+		setConfig("ignoreElementCount", (int) Math.ceil((int) getConfig("ignoreArea") / areaPerElement));
 	}
 
 	/**
@@ -225,7 +249,7 @@ public class Compare extends Config {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public Rectangle[] compare() throws InterruptedException {
+	public Polygon[] compare() throws InterruptedException {
 		computeMatrixSize();
 		subThreads = new Thread[(int) getConfig("maxThreadPool")];
 		startProcess((int) getConfig("currentIndex"));
@@ -233,14 +257,12 @@ public class Compare extends Config {
 			if (threadCount > 0) {
 				wait();
 			}
-			Process p = new Process(imgBound,(int)getConfig("compareRow"),(int)getConfig("compareColumn"),this);
+			Process p = new Process(imgBound, (int) getConfig("compareRow"), (int) getConfig("compareColumn"), this);
 			p.merge();
 			if ((boolean) getConfig("needTransform")) {
 				transformCoordinate();
-			} else {
-				return imgBound;
 			}
-			return imgBound;
+			return (Polygon[]) getConfig("CompareRsult");
 		}
 	}
 
@@ -252,9 +274,6 @@ public class Compare extends Config {
 		}
 	}
 
-	public Compare() {
-	}
-	
 	public Compare(double[] rectangle, String imgURL1, String imgURL2) {
 		this.rectangle = new Rectangle(reform(rectangle), true);
 		defaultSetting();
@@ -273,15 +292,13 @@ public class Compare extends Config {
 	}
 
 	public static void main(String[] args) {
-		Compare a = new Compare(45.0769349657265, 90.82141185464081, 47.032121099508096, 93.97137099423514,
+		Compare a = new Compare(90.82141185464081,45.0769349657265, 93.97137099423514, 47.032121099508096,
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
-//			Rectangle[] bs = 
-					a.compare();
-//			if (bs[0] == null) {
-//				System.out.println("null");
-//			}
-//			System.out.println(a.toString());
+			Polygon[] as =  a.compare();
+			for(int i = 0; i< as.length;i++) {
+				System.out.println(as[i].toString());
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

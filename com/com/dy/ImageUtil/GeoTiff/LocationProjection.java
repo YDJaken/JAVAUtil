@@ -65,9 +65,6 @@ public class LocationProjection extends Config {
 		Integer[] a = getAllIndex();
 		for (int i = 0; i < a.length; i++) {
 			Integer as = a[i];
-			if(as == 17) {
-				System.out.println();
-			}
 			String colorStr = Process.color[as%10];
 			Stack<Rectangle> tmp = getIndex(as);
 			for (int j = 0; j < tmp.size(); j++) {

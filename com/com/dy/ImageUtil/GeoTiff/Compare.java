@@ -174,13 +174,12 @@ public class Compare extends Config {
 				threadCount++;
 			}
 		}
-		if (pt == null) {
-			pt = new ProtectThread(subThreads, this);
-			pt.start();
-		}
+		reProtect();
 		synchronized (this) {
 			if (threadCount > 0) {
-				wait();
+				while (threadCount > 0) {
+					wait();
+				}
 				if (needGo) {
 					startProcess((int) getConfig("currentIndex"));
 				}

@@ -12,7 +12,7 @@ import com.dy.Util.MatrixUtil;
 
 public class Process extends Config {
 
-	final static String[] color = { "#FFB6C1", "#FFFF00", "#99FF00", "#9999FF", "#FF6600", "#990000", "#0000FF",
+	public final static String[] color = { "#FFB6C1", "#FFFF00", "#99FF00", "#9999FF", "#FF6600", "#990000", "#0000FF",
 			"#33CCFF", "#FF9966", "#00FF33" };
 	private final Rectangle[][] matrix;
 
@@ -266,7 +266,7 @@ public class Process extends Config {
 		if (matrix[i][j] == null)
 			return;
 		Object current = matrix[i][j].getConfig("RegionIndex");
-		if ((int) current == right)
+		if (current != null && (int) current == right)
 			return;
 
 		matrix[i][j].setConfig("RegionIndex", right);
@@ -362,7 +362,7 @@ public class Process extends Config {
 	 * @param target
 	 * @return
 	 */
-	static boolean testStack(Stack<Polygon> stack, Rectangle target) {
+	public static boolean testStack(Stack<Polygon> stack, Rectangle target) {
 		Stack<Integer> count = new Stack<>();
 		L1: for (int i = 0; i < stack.size(); i++) {
 			Polygon current = stack.get(i);
@@ -730,7 +730,7 @@ public class Process extends Config {
 	 * @param rec
 	 * @return
 	 */
-	static Polygon mergePolygon(Polygon one, Polygon two, Rectangle rec) {
+	public static Polygon mergePolygon(Polygon one, Polygon two, Rectangle rec) {
 		Polygon right, left;
 		int[] rightIndex = Process.findIndex(one, rec), leftIndex = Process.findIndex(two, rec), tmpIndex = rightIndex;
 		if (rightIndex[2] == 1 || one.position[rightIndex[0] - 1].x >= one.position[rightIndex[0]].x) {

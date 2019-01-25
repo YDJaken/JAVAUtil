@@ -105,7 +105,7 @@ public class Rectangle extends Config {
 	 * @param right
 	 * @return
 	 */
-	static boolean equals(Rectangle left, Rectangle right) {
+	public static boolean equals(Rectangle left, Rectangle right) {
 		return (left == right) || ((left.west == right.west) && (left.south == right.south) && (left.east == right.east)
 				&& (left.north == right.north));
 	}
@@ -116,7 +116,7 @@ public class Rectangle extends Config {
 	 * @param rec
 	 * @return
 	 */
-	Point southwest() {
+	public Point southwest() {
 		return isImage ? new Point(this.west, this.north) : new Point(this.west, this.south);
 	}
 
@@ -126,7 +126,7 @@ public class Rectangle extends Config {
 	 * @param rec
 	 * @return
 	 */
-	Point northwest() {
+	public Point northwest() {
 		return isImage ? new Point(this.west, this.south) : new Point(this.west, this.north);
 	}
 
@@ -136,7 +136,7 @@ public class Rectangle extends Config {
 	 * @param rec
 	 * @return
 	 */
-	Point northeast() {
+	public Point northeast() {
 		return isImage ? new Point(this.east, this.south) : new Point(this.east, this.north);
 	}
 
@@ -146,7 +146,7 @@ public class Rectangle extends Config {
 	 * @param rec
 	 * @return
 	 */
-	Point southeast() {
+	public Point southeast() {
 		return isImage ? new Point(this.east, this.north) : new Point(this.east, this.south);
 	}
 
@@ -156,7 +156,7 @@ public class Rectangle extends Config {
 	 * @param rec
 	 * @return
 	 */
-	Point center() {
+	public Point center() {
 		double east = this.east, west = this.west;
 		if (east < west) {
 			east += Coordinate.two_pi;
@@ -169,7 +169,7 @@ public class Rectangle extends Config {
 	 * 
 	 * @return
 	 */
-	Point[] toPointArray() {
+	public Point[] toPointArray() {
 		return new Point[] { northwest(), northeast(), southeast(), southwest() };
 	}
 
@@ -349,7 +349,7 @@ public class Rectangle extends Config {
 	 * @param otherRectangle
 	 * @return
 	 */
-	static Rectangle simpleUnion(Rectangle rectangle, Rectangle otherRectangle) {
+	public static Rectangle simpleUnion(Rectangle rectangle, Rectangle otherRectangle) {
 		if (!Rectangle.nextTo(rectangle, otherRectangle))
 			return null;
 		boolean img = rectangle.isImage && otherRectangle.isImage;

@@ -1,4 +1,4 @@
-package com.dy.ImageUtil.GeoTiff;
+package com.dy.ImageUtil.GeoTiff.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,6 +8,11 @@ import java.util.Stack;
 import org.junit.jupiter.api.Test;
 
 import com.dy.ImageUtil.TiffUtil;
+import com.dy.ImageUtil.GeoTiff.ImageDrawUtil;
+import com.dy.ImageUtil.GeoTiff.Point;
+import com.dy.ImageUtil.GeoTiff.Polygon;
+import com.dy.ImageUtil.GeoTiff.Process;
+import com.dy.ImageUtil.GeoTiff.Rectangle;
 
 class PolygonTester {
 

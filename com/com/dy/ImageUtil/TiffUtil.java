@@ -131,6 +131,43 @@ public class TiffUtil {
 		return bres;
 	}
 
+	public static boolean saveTif(BufferedImage[] tif, int index, String origin, String saveSrc) {
+		return saveTif(tif,index,new File(origin), new File(saveSrc));
+	}
+	
+	public static boolean saveTif(BufferedImage[] tifs,int index, File origin, File saveSrc) {
+		boolean bres = true;
+		ImageReader reader = null;
+		FileImageInputStream fis = null;
+		try {
+			reader = ImageIO.getImageReadersByFormatName("tiff").next();
+			fis = new FileImageInputStream(origin);
+			reader.setInput(fis);
+			long[] dpiData = getTiffDPI(reader, index);
+			RenderedImage[]  render = new RenderedImage[tifs.length];
+			for(int i = 0; i<tifs.length;i++) {
+				render[i] = tifs[i];
+			}
+			bres = createTiff(saveSrc, render, dpiData, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+			bres = false;
+		} finally {
+			if (reader != null) {
+				reader.dispose();
+			}
+			if (fis != null) {
+				try {
+					fis.flush();
+					fis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return bres;
+	}
+	
 	// 从tiff文件生成原始像素大小tiff文件
 	public static boolean makeSingleTif(File fTiff, File decDir) {
 		boolean bres = true;

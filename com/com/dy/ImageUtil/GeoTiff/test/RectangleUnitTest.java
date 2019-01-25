@@ -1,8 +1,11 @@
-package com.dy.ImageUtil.GeoTiff;
+package com.dy.ImageUtil.GeoTiff.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import com.dy.ImageUtil.GeoTiff.Point;
+import com.dy.ImageUtil.GeoTiff.Rectangle;
 
 class RectangleUnitTest {
 

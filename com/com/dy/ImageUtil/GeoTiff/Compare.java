@@ -24,7 +24,6 @@ public class Compare extends Config {
 	private Thread[] subThreads;
 	Integer threadCount = 0;
 	private ProtectThread pt;
-	
 
 	public Rectangle getRectangle() {
 		return rectangle;
@@ -192,7 +191,7 @@ public class Compare extends Config {
 
 	// TODO 将图片坐标的矩阵转换为经纬度或者传入坐标系
 	private void transformCoordinate() {
-		
+
 	}
 
 	// 计算图片被切分的矩阵行列数
@@ -216,7 +215,7 @@ public class Compare extends Config {
 		double areaPerElement = ((double) getConfig("realWorldWidthDelta") * pixelWidth)
 				* ((double) getConfig("realWorldHeightDelta") * pixelHeight);
 		// 忽略的单元格子数
-		setConfig("ignoreElementCount",(int)Math.ceil((int)getConfig("ignoreArea")/areaPerElement));
+		setConfig("ignoreElementCount", (int) Math.ceil((int) getConfig("ignoreArea") / areaPerElement));
 	}
 
 	/**
@@ -233,7 +232,7 @@ public class Compare extends Config {
 			if (threadCount > 0) {
 				wait();
 			}
-			Process p = new Process(imgBound,(int)getConfig("compareRow"),(int)getConfig("compareColumn"),this);
+			Process p = new Process(imgBound, (int) getConfig("compareRow"), (int) getConfig("compareColumn"), this);
 			p.merge();
 			if ((boolean) getConfig("needTransform")) {
 				transformCoordinate();
@@ -254,7 +253,7 @@ public class Compare extends Config {
 
 	public Compare() {
 	}
-	
+
 	public Compare(double[] rectangle, String imgURL1, String imgURL2) {
 		this.rectangle = new Rectangle(reform(rectangle), true);
 		defaultSetting();
@@ -277,7 +276,7 @@ public class Compare extends Config {
 				"/data/DownLoad/001.tif", "/data/DownLoad/002.tif");
 		try {
 //			Rectangle[] bs = 
-					a.compare();
+			a.compare();
 //			if (bs[0] == null) {
 //				System.out.println("null");
 //			}

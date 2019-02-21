@@ -1,11 +1,28 @@
 package com.dy.ImageUtil;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
+
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGEncodeParam;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 public class ImageUtill {
 
@@ -275,76 +292,150 @@ public class ImageUtill {
 		ImageIO.write(DestImage, format, new File(DestSrc));
 	}
 
+	/**
+	 * 修改图片的DPI(jpeg版)
+	 * 
+	 * @param image
+	 * @param dpi
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] setImageDPI(File f, BufferedImage image, int dpi, float quality) throws IOException {
+		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
+		if (!iw.hasNext())
+			return null;
+		ImageWriter writer = iw.next();
+
+		Iterator<ImageReader> ir = ImageIO.getImageReadersByFormatName("jpeg");
+		if (!ir.hasNext())
+			return null;
+		ImageReader reader = ir.next();
+		reader.setInput(ImageIO.createImageInputStream(f));
+
+		ImageWriteParam writeParams = writer.getDefaultWriteParam();
+		writeParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		// 调整图片质量
+		writeParams.setCompressionQuality(quality);
+
+		IIOMetadata data = writer.getDefaultImageMetadata(new ImageTypeSpecifier(image), writeParams);
+		if (data.isReadOnly() || !data.isStandardMetadataFormatSupported()) {
+			return null;
+		}
+		IIOMetadataNode tree = (IIOMetadataNode) data.getAsTree("javax_imageio_jpeg_image_1.0");
+//		String outS = printTree(tree);
+//		System.out.println(outS);
+//		File file = new File("D:\\FFOutput\\test.txt");
+//		PrintStream ps;
+//		try {
+//			ps = new PrintStream(new FileOutputStream(file));
+//			ps.write(outS.getBytes());
+//			ps.flush();
+//			ps.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		if (tree.getElementsByTagName("app0JFIF").getLength() == 0)
+			return null;
+		IIOMetadataNode jfif = (IIOMetadataNode) tree.getElementsByTagName("app0JFIF").item(0);
+		jfif.setAttribute("Xdensity", dpi + "");
+		jfif.setAttribute("Ydensity", dpi + "");
+		jfif.setAttribute("resUnits", "1");
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ImageOutputStream stream = null;
+		try {
+			stream = ImageIO.createImageOutputStream(out);
+			writer.setOutput(stream);
+			writer.write(data, new IIOImage(image, null, null), writeParams);
+		} finally {
+			stream.close();
+		}
+
+		return out.toByteArray();
+	}
+
+	public static String printTree(IIOMetadataNode tree) {
+		String ret = "";
+		if (tree.getAttributes().getLength() > 0) {
+			for (int j = 0; j < tree.getAttributes().getLength(); j++) {
+				IIOMetadataNode attribute = (IIOMetadataNode) tree.getAttributes().item(j);
+				ret += attribute.getNodeName() + "=" + attribute.getNodeValue() + ";\n";
+			}
+		}
+		for (int i = 0; i < tree.getChildNodes().getLength(); i++) {
+			ret += ImageUtill.printTree((IIOMetadataNode) tree.getChildNodes().item(i));
+		}
+		return ret;
+	}
+
+	public BufferedImage test(BufferedImage image, File file, int dpi, float quality) throws IOException {
+		FileOutputStream fos = new FileOutputStream(file);
+		JPEGImageEncoder jpegEncoder = JPEGCodec.createJPEGEncoder(fos);
+		JPEGEncodeParam jpegEncodeParam = jpegEncoder.getDefaultJPEGEncodeParam(image);
+		jpegEncodeParam.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+		jpegEncoder.setJPEGEncodeParam(jpegEncodeParam);
+		jpegEncodeParam.setQuality(quality, false);
+		jpegEncodeParam.setXDensity(dpi);
+		jpegEncodeParam.setYDensity(dpi);
+		jpegEncoder.encode(image, jpegEncodeParam);
+		image.flush();
+		fos.close();
+		return image;
+//		TIFFDecodeParam decodeParam = new TIFFDecodeParam();
+//		decodeParam.setJPEGDecompressYCbCrToRGB(false);
+//		ImageDecoder decoder = ImageCodec.createImageDecoder("TIFF", new FileInputStream(new File("")), decodeParam);
+//		RenderedImage image = decoder.decodeAsRenderedImage();
+////		JPEGDecodeParam decodeParam = new JPEGDecodeParam();
+////		ImageDecoder decoder = ImageCodec.createImageDecoder("JPEG", new FileInputStream(new File("")), decodeParam);
+////		RenderedImage image = decoder.decodeAsRenderedImage();
+//		JPEGEncodeParam encoderParam = new JPEGEncodeParam();
+//		encoderParam.setQuality(0.75f);
+//		ImageEncoder encoder = ImageCodec.createImageEncoder("JPEG", new FileOutputStream(new File("")), encoderParam);
+//		encoder.encode(buf);
+	}
+
+	/**
+	 * 更改图片分辨率并且压缩图片
+	 */
+	public static void resizeAndCompress() {
+		int target = 1;
+		String imgurl = "D:\\FFOutput\\" + target + ".jpg";
+		String output = "D:\\FFOutput\\";
+		BufferedImage sourceImage;
+		int width = 358, height = 441;
+		float q = 0.6f;
+		try {
+			sourceImage = ImageUtill.getBufferedImage(imgurl);
+			for (int i = 1; i <= 13; i++) {
+				BufferedImage tempImage = new BufferedImage(width, height, i);
+				Graphics2D g2D = (Graphics2D) tempImage.getGraphics();
+				g2D.drawImage(sourceImage.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+				g2D.dispose();
+				byte[] modified = ImageUtill.setImageDPI(new File(imgurl), tempImage, 72, q);
+				if (modified == null)
+					continue;
+				File tmp = new File(output + target + "_" + i + ".jpg");
+				if (!tmp.exists())
+					tmp.createNewFile();
+				FileOutputStream fio = new FileOutputStream(tmp);
+				fio.write(modified);
+				fio.flush();
+				fio.close();
+//				JPEGEncodeParam  enparam = new JPEGEncodeParam();
+////				JPEGImageEncoder encoder = new JPEGImageEncoder(, enparam);
+//				Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
+//				if (!iw.hasNext())
+//					continue;
+//				ImageWriter writer = iw.next();
+//				JPEGImageWriteParam writeParams = (JPEGImageWriteParam)writer.getDefaultWriteParam();
+//				writeParams.setCompressionQuality(0.7f);
+//				ImageIO.write(tempImage, "jpg", new File(output + target + "_" + i + ".jpg"));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args) {
-//		String imgurl = "/data/DownLoad/Map/16/";
-//		String output = "/data/DownLoad/Map/";
-//		BufferedImage DestImage = new BufferedImage(MoveServlet.IMAGE_SIZE * 11, MoveServlet.IMAGE_SIZE * 11,
-//				BufferedImage.TYPE_INT_RGB);
-//		for (int y = 10; y >= 0; y--) {
-//			for (int x = 0; x < 10; x++) {
-//				try {
-//					BufferedImage origin = ImageUtill
-//							.getBufferedImage(imgurl + (y + 24841) + File.separator + (x + 54955) + ".png");
-//					ImageUtill.mergeImage(DestImage, origin, MoveServlet.IMAGE_SIZE * (10 - y),
-//							MoveServlet.IMAGE_SIZE * x, false);
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//
-//			}
-//		}
-//		ImageUtill.saveImage(DestImage, output, "test", "png");
-//		String imgurl = "/data/DownLoad/output.png";
-//		try {
-//			BufferedImage origin = ImageUtill.getBufferedImage(imgurl);
-//			int w2 = origin.getWidth();
-//			int h2 = origin.getHeight();
-//			int[] ImageArrayTwo = new int[w2 * h2];
-//			ImageArrayTwo = origin.getRGB(0, 0, w2, h2, ImageArrayTwo, 0, w2);
-//			System.out.println(ImageUtill.findFlag(ImageArrayTwo));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		String imgurl = "/data/DownLoad/MapV/17/51958/106831.png";
-//		String imgurl2 = "/data/DownLoad/MapV/17/51958/106832.png";
-//		String imgurl3 = "/data/DownLoad/MapV/17/51958/106833.png";
-//		String imgurl4 = "/data/DownLoad/MapV/17/51958/106834.png";
-//		String imgurl5 = "/data/DownLoad/MapV/17/51958/106835.png";
-//		String output = "/data/DownLoad/MapV/";
-//		BufferedImage DestImage = new BufferedImage(MoveServlet.IMAGE_SIZE * 5, MoveServlet.IMAGE_SIZE,
-//				BufferedImage.TYPE_INT_RGB);
-//		try {
-//			BufferedImage origin = ImageUtill.getBufferedImage(imgurl);
-//			BufferedImage origin2 = ImageUtill.getBufferedImage(imgurl2);
-//			BufferedImage origin3 = ImageUtill.getBufferedImage(imgurl3);
-//			BufferedImage origin4 = ImageUtill.getBufferedImage(imgurl4);
-//			BufferedImage origin5 = ImageUtill.getBufferedImage(imgurl5);
-//			ImageUtill.mergeImage(DestImage, origin, true, 0, 0, true);
-//			ImageUtill.mergeImage(DestImage, origin2, true, 0, MoveServlet.IMAGE_SIZE, true);
-//			ImageUtill.mergeImage(DestImage, origin3, true, 0, MoveServlet.IMAGE_SIZE * 2, true);
-//			ImageUtill.mergeImage(DestImage, origin4, true, 0, MoveServlet.IMAGE_SIZE * 3, true);
-//			ImageUtill.mergeImage(DestImage, origin5, true, 0, MoveServlet.IMAGE_SIZE * 4, true);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		ImageUtill.saveImage(DestImage, output, "test", "png");
-
-//		HashMap<Integer,Integer> targetMapping = new HashMap<Integer,Integer>();
-//		targetMapping.put(-1, 0);
-//		targetMapping.put(0, 0);
-//		targetMapping.put(16777215, 0);
-//		Integer a =targetMapping.get(-1);
-//		a++;
-//		targetMapping.put(-1,a);
-//		System.out.println(targetMapping.get(-1));
-
-//		String DestSrc = DonloadServlet.DonloadbaseB + 17 + "丨";
-//		String originSrc = DonloadServlet.DonloadbaseV + 17 + "丨";
-//		try {
-//			ImageUtill.mixImage(DestSrc, originSrc, "png");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
+		ImageUtill.resizeAndCompress();
 	}
 }

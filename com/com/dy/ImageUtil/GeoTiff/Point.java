@@ -62,8 +62,40 @@ public class Point extends Config {
 		return ret;
 	}
 
+	public double getX() {
+		return x;
+	}
+
+	public void setX(double x) {
+		this.x = this.longitude = x;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.x = this.longitude = longitude;
+	}
+
+	public double getY() {
+		return y;
+	}
+
+	public void setY(double y) {
+		this.y = this.latitude = y;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.y = this.latitude = latitude;
+	}
+
 	@Override
 	public String toString() {
-		return "2DPoint:{x:" + x + ",y:" + y + "},geographical:{longitude:" + longitude + "latitude:" + latitude + "}";
+		return x + "," + y;
 	}
 }

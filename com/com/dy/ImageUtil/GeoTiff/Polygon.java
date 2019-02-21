@@ -1,7 +1,7 @@
 package com.dy.ImageUtil.GeoTiff;
 
 public class Polygon extends Config {
-	Point[] position;
+	public Point[] position;
 
 	public Polygon(double[] position) {
 		this(Point.fromArray(position));
@@ -90,11 +90,27 @@ public class Polygon extends Config {
 	}
 
 	/**
+	 * 判断两个多边形包围型是否相交
+	 * 
+	 * @param one
+	 * @param two
+	 * @return
+	 */
+	public static boolean simpleIntersection(Polygon one, Polygon two) {
+		Rectangle rec1 = Polygon.loadRectangle(one), rec2 = Polygon.loadRectangle(two);
+		return Rectangle.simpleIntersection(rec1, rec2) != null ? true : rec1.equals(rec2);
+	}
+
+	/**
 	 * 计算此多边形的包围矩形
 	 * 
 	 * @return {Rectangle}
 	 */
-	static Rectangle loadRectangle(Polygon target) {
+	public static Rectangle loadRectangle(Polygon target) {
+		return Polygon.loadRectangle(target, true);
+	}
+
+	public static Rectangle loadRectangle(Polygon target, boolean isImage) {
 		double maxLon = Double.NEGATIVE_INFINITY, maxLat = Double.NEGATIVE_INFINITY, minLon = Double.POSITIVE_INFINITY,
 				minLat = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < target.position.length; i++) {
@@ -103,15 +119,16 @@ public class Polygon extends Config {
 			minLon = Math.min(target.position[i].longitude, minLon);
 			minLat = Math.min(target.position[i].latitude, minLat);
 		}
-		return new Rectangle(minLon, minLat, maxLon, maxLat);
+		return isImage ? new Rectangle((int) minLon, (int) minLat, (int) maxLon, (int) maxLat)
+				: new Rectangle(minLon, minLat, maxLon, maxLat);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
-		ret.append("Polygon:{").append("\n");
+		ret.append("Polygon:{");
 		for (int i = 0; i < position.length; i++) {
-			ret.append(position[i].toString()).append("\n");
+			ret.append(position[i].toString()).append(",");
 		}
 		ret.append("}");
 		return ret.toString();

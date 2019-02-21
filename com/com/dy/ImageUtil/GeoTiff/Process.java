@@ -12,7 +12,7 @@ import com.dy.Util.MatrixUtil;
 
 public class Process extends Config {
 
-	final static String[] color = { "#FFB6C1", "#FFFF00", "#99FF00", "#9999FF", "#FF6600", "#990000", "#0000FF",
+	public final static String[] color = { "#FFB6C1", "#FFFF00", "#99FF00", "#9999FF", "#FF6600", "#990000", "#0000FF",
 			"#33CCFF", "#FF9966", "#00FF33" };
 	private final Rectangle[][] matrix;
 
@@ -43,7 +43,7 @@ public class Process extends Config {
 
 		findBorder();
 
-		printBorder();
+		// printBorder();
 
 		// test();
 
@@ -51,6 +51,7 @@ public class Process extends Config {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void printBorder() {
 		BufferedImage origin = fatherThread.img1[0];
 		for (int i = 0; i < matrix.length; i++) {
@@ -265,7 +266,7 @@ public class Process extends Config {
 		if (matrix[i][j] == null)
 			return;
 		Object current = matrix[i][j].getConfig("RegionIndex");
-		if ((int) current == right)
+		if (current != null && (int) current == right)
 			return;
 
 		matrix[i][j].setConfig("RegionIndex", right);
@@ -299,31 +300,46 @@ public class Process extends Config {
 				}
 			}
 		}
+//		lp.printRectangle();
 		Integer[] indexs = lp.getAllIndex();
 		int ignoreElement = (int) fatherThread.getConfig("ignoreElementCount");
+		Stack<Polygon> all = new Stack<Polygon>();
 		for (int i = 0; i < indexs.length; i++) {
 			Integer index = indexs[i];
 			if (lp.getSize(index) <= ignoreElement) {
 				lp.removeInteger(index);
 			} else {
-				Stack<Polygon> back = transformPolygon(lp.getIndex(index));
+				Stack<Polygon> back = Process.transformPolygon(lp.getIndex(index));
 				if (back.size() > 0) {
-					printPolygon(back, index);
+					while (!back.isEmpty()) {
+						all.push(back.pop());
+					}
 				}
 			}
 		}
+		fatherThread.setConfig("CompareRsult", all.toArray(new Polygon[all.size()]));
+//		printPolygon(all, -1);
+
 	}
 
+	@SuppressWarnings("unused")
 	private void printPolygon(Stack<Polygon> target, int index) {
 		BufferedImage origin = fatherThread.img1[0];
-		String colorStr = color[index % 10];
-		while (!target.isEmpty()) {
-			origin = ImageDrawUtil.drawPolygonOutline(origin, target.pop(), colorStr);
+		if (index == -1) {
+			while (!target.isEmpty()) {
+				origin = ImageDrawUtil.drawPolygonOutline(origin, target.pop(), color[++index % 10]);
+			}
+			index = -1;
+		} else {
+			String colorStr = color[index % 10];
+			while (!target.isEmpty()) {
+				origin = ImageDrawUtil.drawPolygonOutline(origin, target.pop(), colorStr);
+			}
 		}
 		TiffUtil.saveTif(origin, 0, "/data/DownLoad/001.tif", "/home/dy/Desktop/testImage/testP" + index);
 	}
 
-	private Stack<Polygon> transformPolygon(Stack<Rectangle> input) {
+	public static Stack<Polygon> transformPolygon(Stack<Rectangle> input) {
 		int size = input.size();
 		Stack<Polygon> stack = new Stack<>();
 		for (int i = 0; i < size; i++) {
@@ -346,9 +362,9 @@ public class Process extends Config {
 	 * @param target
 	 * @return
 	 */
-	static boolean testStack(Stack<Polygon> stack, Rectangle target) {
-		int count = 0;
-		for (int i = 0; i < stack.size(); i++) {
+	public static boolean testStack(Stack<Polygon> stack, Rectangle target) {
+		Stack<Integer> count = new Stack<>();
+		L1: for (int i = 0; i < stack.size(); i++) {
 			Polygon current = stack.get(i);
 			int[] left = { -1, -1, -1 }, right = { -1, -1, -1 }, outter = { -1, -1 };
 			Point[] points = current.position, recPoint = target.toPointArray();
@@ -401,10 +417,34 @@ public class Process extends Config {
 			}
 			Point[] bigger = new Point[points.length + 4];
 			if (left[0] != -1 && right[0] != -1) {
-				count++;
+				count.push(i);
 				if (left[0] == left[1] && right[0] == right[1]) {
-					points[left[0]] = recPoint[3];
-					points[right[0]] = recPoint[2];
+					if (outter[0] != -1 && outter[1] != -1) {
+						for (int j = 0, tureSize = 0, i_index = 0, max = Math.max(left[0], outter[0]), min = Math
+								.min(right[0], outter[1]); j < bigger.length; j++) {
+							if (i_index < min || i_index > max) {
+								bigger[j] = points[i_index++];
+							} else {
+								bigger[j++] = points[min];
+								bigger[j++] = recPoint[2];
+								bigger[j++] = recPoint[3];
+								bigger[j] = points[max];
+								i_index = max + 1;
+								tureSize += 3;
+							}
+							tureSize++;
+							if (i_index == points.length) {
+								current.position = new Point[tureSize];
+								for (int k = 0; k < tureSize; k++) {
+									current.position[k] = bigger[k];
+								}
+								break;
+							}
+						}
+					} else {
+						points[left[0]] = recPoint[3];
+						points[right[0]] = recPoint[2];
+					}
 				} else if (left[0] != left[1] && right[0] != right[1]) {
 					for (int j = 0, tureSize = 0, i_index = 0, max = left[0], min = right[1]; j < bigger.length; j++) {
 						if (i_index < min || i_index > max) {
@@ -429,10 +469,15 @@ public class Process extends Config {
 						}
 					}
 				} else if (left[0] != left[1]) {
-					for (int j = 0, tureSize = 0, i_index = 0, max = left[0], min = left[1]; j < bigger.length; j++) {
+					for (int j = 0, tureSize = 0, i_index = 0, max = Math.max(left[0], right[0]), min = Math
+							.min(left[1], right[1]); j < bigger.length; j++) {
 						if (i_index < min || i_index > max) {
 							bigger[j] = points[i_index++];
 						} else {
+							if (left[1] != right[1]) {
+								bigger[j++] = points[min];
+								tureSize++;
+							}
 							bigger[j++] = recPoint[2];
 							bigger[j++] = recPoint[3];
 							bigger[j++] = recPoint[0];
@@ -450,7 +495,8 @@ public class Process extends Config {
 						}
 					}
 				} else if (right[0] != right[1]) {
-					for (int j = 0, tureSize = 0, i_index = 0, max = right[0], min = right[1]; j < bigger.length; j++) {
+					for (int j = 0, tureSize = 0, i_index = 0, max = Math.max(left[0], right[0]), min = Math
+							.min(left[1], right[1]); j < bigger.length; j++) {
 						if (i_index < min || i_index > max) {
 							bigger[j] = points[i_index++];
 						} else {
@@ -458,8 +504,12 @@ public class Process extends Config {
 							bigger[j++] = recPoint[1];
 							bigger[j++] = recPoint[2];
 							bigger[j] = recPoint[3];
-							i_index = max + 1;
+							if (left[0] != right[0]) {
+								bigger[++j] = points[max];
+								tureSize++;
+							}
 							tureSize += 3;
+							i_index = max + 1;
 						}
 						tureSize++;
 						if (i_index == points.length) {
@@ -471,21 +521,33 @@ public class Process extends Config {
 						}
 					}
 				}
+				break L1;
 			} else if (left[0] != -1 && right[0] == -1) {
-				count++;
-				if (left[0] != left[1]) {
-					for (int j = 0, tureSize = 0, i_index = 0, max = left[0], min = left[1]; j < bigger.length; j++) {
+				if (left[0] == left[1] && outter[0] == left[1] && outter[1] == -1)
+					continue;
+				count.push(i);
+				int max = left[0];
+				int min = left[1];
+				if (outter[0] != -1 && outter[1] != -1) {
+					max = Math.max(max, outter[0]);
+					min = Math.min(min, outter[1]);
+					for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
 						if (i_index < min || i_index > max) {
 							bigger[j] = points[i_index++];
 						} else {
+							boolean test = recPoint[0].equals(points[max]);
 							bigger[j++] = points[min];
 							bigger[j++] = recPoint[1];
 							bigger[j++] = recPoint[2];
 							bigger[j++] = recPoint[3];
 							bigger[j++] = recPoint[0];
-							bigger[j] = points[max];
+							if (!test) {
+								bigger[j] = points[max];
+							} else {
+								j--;
+							}
 							i_index = max + 1;
-							tureSize += 5;
+							tureSize += test ? 4 : 5;
 						}
 						tureSize++;
 						if (i_index == points.length) {
@@ -497,41 +559,74 @@ public class Process extends Config {
 						}
 					}
 				} else {
-					for (int j = 0, tureSize = 0, i_index = 0, max = left[0], min = left[1]; j < bigger.length; j++) {
-						if (i_index < min || i_index > max) {
-							bigger[j] = points[i_index++];
-						} else {
-							bigger[j++] = recPoint[1];
-							bigger[j++] = recPoint[2];
-							bigger[j] = recPoint[3];
-							i_index = max + 1;
-							tureSize += 2;
-						}
-						tureSize++;
-						if (i_index == points.length) {
-							current.position = new Point[tureSize];
-							for (int k = 0; k < tureSize; k++) {
-								current.position[k] = bigger[k];
+					if (left[0] != left[1]) {
+						for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
+							if (i_index < min || i_index > max) {
+								bigger[j] = points[i_index++];
+							} else {
+								bigger[j++] = points[min];
+								bigger[j++] = recPoint[1];
+								bigger[j++] = recPoint[2];
+								bigger[j++] = recPoint[3];
+								bigger[j++] = recPoint[0];
+								bigger[j] = points[max];
+								i_index = max + 1;
+								tureSize += 5;
 							}
-							break;
+							tureSize++;
+							if (i_index == points.length) {
+								current.position = new Point[tureSize];
+								for (int k = 0; k < tureSize; k++) {
+									current.position[k] = bigger[k];
+								}
+								break;
+							}
+						}
+					} else {
+						for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
+							if (i_index < min || i_index > max) {
+								bigger[j] = points[i_index++];
+							} else {
+								bigger[j++] = recPoint[1];
+								bigger[j++] = recPoint[2];
+								bigger[j] = recPoint[3];
+								i_index = max + 1;
+								tureSize += 2;
+							}
+							tureSize++;
+							if (i_index == points.length) {
+								current.position = new Point[tureSize];
+								for (int k = 0; k < tureSize; k++) {
+									current.position[k] = bigger[k];
+								}
+								break;
+							}
 						}
 					}
 				}
 			} else if (left[0] == -1 && right[0] != -1) {
-				count++;
-				if (right[0] != right[1]) {
-					for (int j = 0, tureSize = 0, i_index = 0, max = right[0], min = right[1]; j < bigger.length; j++) {
+				if (right[0] == right[1] && outter[0] == right[1] && outter[1] == -1)
+					continue;
+				count.push(i);
+				int max = right[0];
+				int min = right[1];
+				if (outter[0] != -1 && outter[1] != -1) {
+					max = Math.max(max, outter[0]);
+					min = Math.min(min, outter[1]);
+					for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
 						if (i_index < min || i_index > max) {
 							bigger[j] = points[i_index++];
 						} else {
-							bigger[j++] = points[min];
+							boolean test = recPoint[1].equals(points[min]);
+							if (!test)
+								bigger[j++] = points[min];
 							bigger[j++] = recPoint[1];
 							bigger[j++] = recPoint[2];
 							bigger[j++] = recPoint[3];
 							bigger[j++] = recPoint[0];
 							bigger[j] = points[max];
 							i_index = max + 1;
-							tureSize += 5;
+							tureSize += test ? 4 : 5;
 						}
 						tureSize++;
 						if (i_index == points.length) {
@@ -543,28 +638,53 @@ public class Process extends Config {
 						}
 					}
 				} else {
-					for (int j = 0, tureSize = 0, i_index = 0, max = right[0], min = right[1]; j < bigger.length; j++) {
-						if (i_index < min || i_index > max) {
-							bigger[j] = points[i_index++];
-						} else {
-							bigger[j++] = recPoint[2];
-							bigger[j++] = recPoint[3];
-							bigger[j] = recPoint[0];
-							i_index = max + 1;
-							tureSize += 2;
-						}
-						tureSize++;
-						if (i_index == points.length) {
-							current.position = new Point[tureSize];
-							for (int k = 0; k < tureSize; k++) {
-								current.position[k] = bigger[k];
+					if (right[0] != right[1]) {
+						for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
+							if (i_index < min || i_index > max) {
+								bigger[j] = points[i_index++];
+							} else {
+								bigger[j++] = points[min];
+								bigger[j++] = recPoint[1];
+								bigger[j++] = recPoint[2];
+								bigger[j++] = recPoint[3];
+								bigger[j++] = recPoint[0];
+								bigger[j] = points[max];
+								i_index = max + 1;
+								tureSize += 5;
 							}
-							break;
+							tureSize++;
+							if (i_index == points.length) {
+								current.position = new Point[tureSize];
+								for (int k = 0; k < tureSize; k++) {
+									current.position[k] = bigger[k];
+								}
+								break;
+							}
+						}
+					} else {
+						for (int j = 0, tureSize = 0, i_index = 0; j < bigger.length; j++) {
+							if (i_index < min || i_index > max) {
+								bigger[j] = points[i_index++];
+							} else {
+								bigger[j++] = recPoint[2];
+								bigger[j++] = recPoint[3];
+								bigger[j] = recPoint[0];
+								i_index = max + 1;
+								tureSize += 2;
+							}
+							tureSize++;
+							if (i_index == points.length) {
+								current.position = new Point[tureSize];
+								for (int k = 0; k < tureSize; k++) {
+									current.position[k] = bigger[k];
+								}
+								break;
+							}
 						}
 					}
 				}
 			} else if (outter[0] != -1 && outter[1] != -1) {
-				count++;
+				count.push(i);
 				for (int j = 0, tureSize = 0, i_index = 0, max = outter[0], min = outter[1]; j < bigger.length; j++) {
 					if (i_index < min || i_index > max) {
 						bigger[j] = points[i_index++];
@@ -589,14 +709,139 @@ public class Process extends Config {
 				}
 			}
 		}
-		if (count > 1) {
-			// TODO 缺少多边形合并逻辑
-			System.out.println(count);
-			for (int i = 0; i < stack.size(); i++) {
-				System.out.println(stack.get(i));
+		if (count.size() > 1) {
+			Polygon base = stack.get(count.get(0));
+			for (int i = 1; i < count.size(); i++) {
+				base = Process.mergePolygon(base, stack.get((int) count.get(i)), target);
+			}
+			while (count.size() > 1) {
+				stack.remove((int) count.pop());
+			}
+			stack.set((int) count.get(0), base);
+		}
+		return count.size() > 0;
+	}
+
+	/**
+	 * 合并两个多边形
+	 * 
+	 * @param one
+	 * @param two
+	 * @param rec
+	 * @return
+	 */
+	public static Polygon mergePolygon(Polygon one, Polygon two, Rectangle rec) {
+		Polygon right, left;
+		int[] rightIndex = Process.findIndex(one, rec), leftIndex = Process.findIndex(two, rec), tmpIndex = rightIndex;
+		if (rightIndex[2] == 1 || one.position[rightIndex[0] - 1].x >= one.position[rightIndex[0]].x) {
+			right = two;
+			left = one;
+			rightIndex = leftIndex;
+			leftIndex = tmpIndex;
+		} else {
+			right = one;
+			left = two;
+		}
+		Stack<Point> pts = new Stack<Point>();
+		int index = 0;
+		int start = rightIndex[1] + 1, end = rightIndex[0] - 1;
+		start = start < right.position.length ? start : 0;
+		end = end >= 0 ? end : right.position.length;
+		if (right.position[start].y == right.position[rightIndex[1]].y
+				&& right.position[start].x > right.position[rightIndex[1]].x) {
+			tmpIndex = Process.findIndex(right.position[start], right.position[end], left);
+			while (index <= tmpIndex[0]) {
+				pts.push(left.position[index++]);
+			}
+			index = start;
+			while (index < right.position.length) {
+				pts.push(right.position[index++]);
+			}
+			index = 0;
+			while (index <= end) {
+				pts.push(right.position[index++]);
+			}
+			index = tmpIndex[1];
+			while (index < left.position.length) {
+				pts.push(left.position[index++]);
+			}
+		} else {
+			while (index < rightIndex[0]) {
+				pts.push(right.position[index++]);
+			}
+			index = leftIndex[1] + 1;
+			while (index < left.position.length) {
+				pts.push(left.position[index++]);
+			}
+			index = 0;
+			while (index < leftIndex[0]) {
+				pts.push(left.position[index++]);
+			}
+			index = leftIndex[2] == 1 ? (rightIndex[0] + 1) : (rightIndex[0]);
+			while (index < right.position.length) {
+				pts.push(right.position[index++]);
 			}
 		}
-		return count > 0;
+		right.position = pts.toArray(new Point[pts.size()]);
+		return right;
+	}
+
+	/**
+	 * 找到两点在一个多边形内的某一点位置位置
+	 * 
+	 * @param point
+	 * @param point2
+	 * @param left
+	 * @return
+	 */
+	static int[] findIndex(Point start, Point end, Polygon left) {
+		int[] ret = new int[] { -1, -1 };
+		for (int i = 0; i < left.position.length; i++) {
+			int next = -1;
+			if (i == left.position.length - 1) {
+				next = 0;
+			} else {
+				next = i + 1;
+			}
+			if (Process.inLine(left.position[i], left.position[next], start)) {
+				ret[0] = i;
+			}
+			if (Process.inLine(left.position[i], left.position[next], end)) {
+				ret[1] = next;
+			}
+			if (ret[0] != -1 && ret[1] != -1)
+				return ret;
+		}
+		return ret;
+	}
+
+	/**
+	 * 找到矩形在目标多边形的位置
+	 * 
+	 * @param pol
+	 * @param rec
+	 * @return
+	 */
+	static int[] findIndex(Polygon pol, Rectangle rec) {
+		int[] ret = new int[] { -1, -1, 0 };
+		Point[] position = rec.toPointArray();
+		for (int i = 0; i < pol.position.length; i++) {
+			if (position[0].equals(pol.position[i])) {
+				ret[1] = i;
+			} else if (position[1].equals(pol.position[i])) {
+				ret[0] = i;
+			} else if (position[2].equals(pol.position[i])) {
+				if (ret[0] == -1) {
+					ret[0] = i;
+					ret[2] = 1;
+				} else {
+					ret[1] = i;
+				}
+			} else if (position[3].equals(pol.position[i])) {
+				ret[1] = i;
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -674,9 +919,5 @@ public class Process extends Config {
 	}
 
 	public static void main(String[] args) {
-		Polygon target = new Polygon(new Rectangle(850, 50, 1000, 75).toPointArray());
-		Stack<Polygon> tt = new Stack<Polygon>();
-		tt.push(target);
-		Process.testStack(tt, new Rectangle(825, 75, 1125, 100));
 	}
 }

@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
+//import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -24,7 +26,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PriorityQueue<MappedByteBuffer> toBytes(File f) throws IOException {
+	public static PriorityQueue<byte[]> toBytes(File f) throws IOException {
 		long length = f.length();
 		int max = Integer.MAX_VALUE;
 		PriorityQueue<Integer> size = new PriorityQueue<>();
@@ -36,19 +38,42 @@ public class FileUtil {
 			size.add((int) length);
 		}
 
-		RandomAccessFile ra = new RandomAccessFile(f, "rw");
-		FileChannel raf = ra.getChannel();
-
-		PriorityQueue<MappedByteBuffer> ret = new PriorityQueue<MappedByteBuffer>();
-		long startPosition = 0;
-		while (!size.isEmpty()) {
-			int endPosition = size.remove() - 1;
-			raf.tryLock(startPosition, endPosition, false);
-			ret.add(raf.map(FileChannel.MapMode.READ_WRITE, startPosition, endPosition));
-			startPosition += max;
+		RandomAccessFile ra = null;
+		FileChannel raf = null;
+		PriorityQueue<byte[]> ret = null;
+		try {
+			ra = new RandomAccessFile(f, "r");
+			raf = ra.getChannel();
+			ret = new PriorityQueue<byte[]>();
+			long startPosition = 0;
+			while (!size.isEmpty()) {
+				int endPosition = size.remove();
+				byte[] buf = new byte[(int)(endPosition - startPosition)];
+				ra.read(buf);
+//				MappedByteBuffer tmp = raf.map(FileChannel.MapMode.READ_ONLY, startPosition, endPosition);
+//				byte[] buf = null;
+//				if(tmp.hasArray()) {
+//					buf = tmp.array();
+//				}else {
+//					int limit = tmp.limit();
+//					buf = new byte[limit];
+//					tmp.get(buf);
+//				}
+//				tmp.clear();
+				ret.add(buf);
+				startPosition += max;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (raf != null) {
+				if(raf.isOpen())
+				raf.close();
+			}
+			if (ra != null) {
+				ra.close();
+			}
 		}
-		raf.close();
-		ra.close();
 		return ret;
 	}
 
@@ -72,36 +97,46 @@ public class FileUtil {
 			size[0] = max;
 			size[1] = (int) (length - max);
 		}
-		RandomAccessFile ra = new RandomAccessFile(f, "r");
-		PriorityQueue<byte[]> ret = new PriorityQueue<byte[]>();
-		int startPosition = 0;
-		if (size[1] == 0) {
-			byte[] b = new byte[size[0]];
-			ra.read(b);
-			ret.add(b);
-		} else {
-			byte[] b = new byte[size[0]];
-			int endPosition = size[0] - 1;
-			ra.readFully(b, startPosition, endPosition);
-			ret.add(b);
-			startPosition += max;
-			endPosition = size[1];
-			ra.readFully(b, startPosition, endPosition);
-			ret.add(b);
+		RandomAccessFile ra = null;
+		PriorityQueue<byte[]> ret = null;
+		try {
+			ra = new RandomAccessFile(f, "r");
+			ret = new PriorityQueue<byte[]>();
+			int startPosition = 0;
+			if (size[1] == 0) {
+				byte[] b = new byte[size[0]];
+				ra.read(b);
+				ret.add(b);
+			} else {
+				byte[] b = new byte[size[0]];
+				int endPosition = size[0] - 1;
+				ra.readFully(b, startPosition, endPosition);
+				ret.add(b);
+				startPosition += max;
+				endPosition = size[1];
+				ra.readFully(b, startPosition, endPosition);
+				ret.add(b);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (ra != null) {
+				ra.close();
+			}
 		}
-		ra.close();
 		return ret;
 	}
 
-	public static boolean isGzip(File sourcedir) {
+	public static boolean isGzip(File sourcedir) throws IOException {
 		boolean ret = false;
+		FileInputStream fin = null;
 		try {
-			FileInputStream fin = new FileInputStream(sourcedir);
+			fin = new FileInputStream(sourcedir);
 			byte[] buf = new byte[2];
 			fin.read(buf);
 			int b = (buf[1] & 0xFF) << 8 | buf[0];
 			ret = b == GZIPInputStream.GZIP_MAGIC;
-			fin.close();
 		} catch (FileNotFoundException e) {
 			System.err.println(e.toString());
 			// e.printStackTrace();
@@ -110,6 +145,9 @@ public class FileUtil {
 			System.err.println(e.toString());
 			// e.printStackTrace();
 			return ret;
+		} finally {
+			if (fin != null)
+				fin.close();
 		}
 		return ret;
 	}
@@ -250,5 +288,49 @@ public class FileUtil {
 			}
 			moveFile(a, b);
 		}
+	}
+
+	/**
+	 * *向文件写入字符串
+	 * 
+	 * @param f
+	 * @param s
+	 * @return
+	 */
+
+	public static boolean writeString(File f, String s) {
+		FileOutputStream fileOutputStream = null;
+		try {
+			f.setWritable(true);
+			fileOutputStream = new FileOutputStream(f);
+			byte[] bytes = s.getBytes("UTF-8");
+			fileOutputStream.write(bytes, 0, bytes.length);
+			fileOutputStream.flush();
+			fileOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * * 列出目录下的文件不包含文件夹
+	 * 
+	 * @param dir
+	 * @return
+	 */
+	public static String[] loadsubFiles(File dir) {
+		if (!dir.isDirectory())
+			return null;
+		File[] fs = dir.listFiles();
+		List<String> ret = new LinkedList<>();
+		for (int i = 0; i < fs.length; i++) {
+			if (!fs[i].isDirectory()) {
+				ret.add(fs[i].getName());
+			}
+		}
+		return ret.toArray(new String[ret.size()]);
 	}
 }

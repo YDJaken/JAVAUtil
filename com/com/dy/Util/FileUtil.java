@@ -48,7 +48,7 @@ public class FileUtil {
 			long startPosition = 0;
 			while (!size.isEmpty()) {
 				int endPosition = size.remove();
-				byte[] buf = new byte[(int)(endPosition - startPosition)];
+				byte[] buf = new byte[(int) (endPosition - startPosition)];
 				ra.read(buf);
 //				MappedByteBuffer tmp = raf.map(FileChannel.MapMode.READ_ONLY, startPosition, endPosition);
 //				byte[] buf = null;
@@ -67,8 +67,8 @@ public class FileUtil {
 			e.printStackTrace();
 		} finally {
 			if (raf != null) {
-				if(raf.isOpen())
-				raf.close();
+				if (raf.isOpen())
+					raf.close();
 			}
 			if (ra != null) {
 				ra.close();
@@ -303,7 +303,7 @@ public class FileUtil {
 		try {
 			f.setWritable(true);
 			fileOutputStream = new FileOutputStream(f);
-			byte[] bytes = s.getBytes("UTF-8");
+			byte[] bytes = s.getBytes(File.separator.equals("/") ? "UTF-8" : "GBK");
 			fileOutputStream.write(bytes, 0, bytes.length);
 			fileOutputStream.flush();
 			fileOutputStream.close();
@@ -332,5 +332,11 @@ public class FileUtil {
 			}
 		}
 		return ret.toArray(new String[ret.size()]);
+	}
+
+	public static File[] loadsubFilesAsFile(File dir) {
+		if (!dir.isDirectory())
+			return null;
+		return dir.listFiles();
 	}
 }

@@ -4,6 +4,7 @@
     <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/com/dy/Util/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/Util/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/com/dy/Util/OBJUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/Util/OBJUtil.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,56 +17,16 @@
   </component>
   <component name="ProjectId" id="1Pm07x2Vg6KYv8dXpaAqHBSOq5q" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectView">
-    <navigator currentView="Scope" currentSubView="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope" proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope">
-        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
-          <expand>
-            <path>
-              <item name="JAVAUtil" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="C:\Users\hp\IdeaProjects\JAVAUtil" type="442cc68d:ScopeViewTreeModel$RootNode" />
-            </path>
-            <path>
-              <item name="JAVAUtil" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="C:\Users\hp\IdeaProjects\JAVAUtil" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="JAVAUtil" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="C:\Users\hp\IdeaProjects\JAVAUtil" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="JAVAUtil" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="C:\Users\hp\IdeaProjects\JAVAUtil" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="dy" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="JAVAUtil" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="C:\Users\hp\IdeaProjects\JAVAUtil" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="dy" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="Util" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="ProjectPane" />
-      <pane id="PackagesPane" />
-    </panes>
-  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
@@ -107,6 +68,8 @@
       <workItem from="1548250222979" duration="389000" />
       <workItem from="1563341799071" duration="89000" />
       <workItem from="1566463802482" duration="28000" />
+      <workItem from="1567996298850" duration="760000" />
+      <workItem from="1568080903073" duration="599000" />
     </task>
     <servers />
   </component>
@@ -118,7 +81,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

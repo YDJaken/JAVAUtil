@@ -315,6 +315,30 @@ public class FileUtil {
 		return true;
 	}
 
+	public static String readString(File f) {
+		FileInputStream fio = null;
+		String ret = new String();
+		String encoding = File.separator.equals("/") ? "UTF-8" : "GBK";
+		try {
+			f.setReadable(true);
+			fio = new FileInputStream(f);
+			long fileLength = f.length();
+			if (fileLength > Integer.MAX_VALUE) {
+				fio.close();
+				throw new IOException("File size over " + Integer.MAX_VALUE + " bytes.");
+			}
+			byte[] buff = new byte[(int) fileLength];
+			while (fio.read(buff) != -1) {
+				ret = new String(buff, encoding);
+			}
+			fio.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+
 	/**
 	 * * 列出目录下的文件不包含文件夹
 	 * 

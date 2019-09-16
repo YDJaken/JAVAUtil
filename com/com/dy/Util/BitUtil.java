@@ -16,7 +16,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将字节数组转为Double
+	 *	 将字节数组转为Double
 	 * 
 	 * @param bytes
 	 * @return
@@ -30,7 +30,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将double 转换为 字节数组
+	 * 	将double 转换为 字节数组
 	 * 
 	 * @param value
 	 * @return
@@ -50,7 +50,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将字节数组转为Float
+	 * 	将字节数组转为Float
 	 * 
 	 * @param bytes
 	 * @return
@@ -64,7 +64,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将float 转换为 字节数组
+	 *	 将float 转换为 字节数组
 	 * 
 	 * @param value
 	 * @return
@@ -84,7 +84,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将字节数组转为Short
+	 *	 将字节数组转为Short
 	 * 
 	 * @param b
 	 * @return
@@ -96,7 +96,7 @@ public abstract class BitUtil {
 	public abstract short toShort(byte[] b, int offset);
 
 	/**
-	 * 将Short转为 字节数组
+	 *	 将Short转为 字节数组
 	 * 
 	 * @param b
 	 * @return
@@ -114,7 +114,7 @@ public abstract class BitUtil {
 	public abstract void fromShort(byte[] bytes, short value, int offset);
 
 	/**
-	 * 将字节数组转为int
+	 * 	将字节数组转为int
 	 * 
 	 * @param b
 	 * @return
@@ -126,7 +126,7 @@ public abstract class BitUtil {
 	public abstract int toInt(byte[] b, int offset);
 
 	/**
-	 * 将int转为 字节数组
+	 * 	将int转为 字节数组
 	 * 
 	 * @param b
 	 * @return
@@ -144,7 +144,7 @@ public abstract class BitUtil {
 	public abstract void fromInt(byte[] bytes, int value, int offset);
 
 	/**
-	 * 将字节数组转为long
+	 * 	将字节数组转为long
 	 * 
 	 * @param b
 	 * @return
@@ -158,7 +158,7 @@ public abstract class BitUtil {
 	public abstract long toLong(byte[] b, int offset);
 
 	/**
-	 * 将long转为 字节数组
+	 * 	将long转为 字节数组
 	 * 
 	 * @param b
 	 * @return
@@ -176,7 +176,7 @@ public abstract class BitUtil {
 	public abstract void fromLong(byte[] bytes, long value, int offset);
 	
 	/**
-	 * 将String的字节转换为long
+	 * 	将String的字节转换为long
 	 * @param str
 	 * @return
 	 */
@@ -199,7 +199,7 @@ public abstract class BitUtil {
 	public abstract byte[] fromBitString(String str);
 
 	/**
-	 * 从long 转换为 BitString
+	 * 	从long 转换为 BitString
 	 * @param value
 	 * @return
 	 */
@@ -208,7 +208,7 @@ public abstract class BitUtil {
 	}
 
 	/**
-	 * 将 long 按照高位转换为String "01010101"
+	 * 	将 long 按照高位转换为String "01010101"
 	 * @param value
 	 * @param bits
 	 * @return

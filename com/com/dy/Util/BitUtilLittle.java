@@ -6,7 +6,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将低序字节转换为short
+	 *	 将低序字节转换为short
 	 */
 	@Override
 	public final short toShort(byte[] b, int offset) {
@@ -14,7 +14,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将short转换为低序字节
+	 *	 将short转换为低序字节
 	 */
 	@Override
 	public void fromShort(byte[] bytes, short value, int offset) {
@@ -23,7 +23,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将低序字节转换为int
+	 * 	将低序字节转换为int
 	 */
 	@Override
 	public final int toInt(byte[] b, int offset) {
@@ -32,7 +32,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将int转换为低序字节
+	 *	 将int转换为低序字节
 	 */
 	@Override
 	public final void fromInt(byte[] bytes, int value, int offset) {
@@ -43,7 +43,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将低序字节转换为long
+	 * 	将低序字节转换为long
 	 * 
 	 * @param int1 高位字节
 	 * @param int0 低位字节
@@ -54,7 +54,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将低序字节转换为long
+	 *	 将低序字节转换为long
 	 * 
 	 * @param offset 区分高低位字节的位置
 	 */
@@ -79,7 +79,7 @@ public class BitUtilLittle extends BitUtil {
 	}
 
 	/**
-	 * 将 BitString 转换为低位字节数组
+	 * 	将 BitString 转换为低位字节数组
 	 */
 	@Override
 	public byte[] fromBitString(String str) {

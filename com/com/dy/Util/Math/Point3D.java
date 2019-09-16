@@ -38,7 +38,7 @@ public class Point3D {
 	}
 	
 	 /**
-     * 标量乘
+     * 	标量乘
      * @param scale
      */
     public void applyScaler(Double scale) {
@@ -46,9 +46,14 @@ public class Point3D {
         this.y *= scale;
         this.z *= scale;
     }
+    
 	
+    public String toString() {
+    	return "x: " + this.x + ", y:" + this.y + " ,z:" + this.z;
+    }
+    
 	/**
-     * 获得-V
+     * 	获得-V
      */
     public void ngate() {
     	this.x = -this.x;
@@ -57,7 +62,7 @@ public class Point3D {
     }
 
     /**
-     * 向量加
+     * 	向量加
      * @param otherPoint
      */
     public void add(Point3D otherPoint) {
@@ -67,7 +72,7 @@ public class Point3D {
     }
 
     /**
-     * 向量减
+     *	 向量减
      * @param otherPoint
      */
     public void subtraction(Point3D otherPoint) {
@@ -77,7 +82,7 @@ public class Point3D {
     }
 
 	/**
-	 * 外积 叉乘
+	 * 	外积 叉乘
 	 * 
 	 * @param otherPoint
 	 */
@@ -90,7 +95,7 @@ public class Point3D {
 	}
 
 	/**
-	 * 内积 点乘
+	 *	 内积 点乘
 	 * 
 	 * @param otherPoint
 	 * @return {number}
@@ -100,7 +105,7 @@ public class Point3D {
 	}
 
 	/**
-     * 计算点的大小
+     *	 计算点的大小
      * @param point
      * @return {*}
      */
@@ -113,6 +118,7 @@ public class Point3D {
 	}
 
 	public static Point3D fromString(String position, String spliter) throws Error {
+		position = position.trim();
 		String[] aim = position.split(spliter);
 		if (aim.length != 3) {
 			throw new Error("Input String is not valid!");

@@ -139,11 +139,4 @@ public class BitUtilBig extends BitUtil {
 	public String toString() {
 		return "big";
 	}
-
-	public static void main(String[] args) {
-		/*
-		 * BitUtilBig big = new BitUtilBig(); long size = big.toLong(50, 60);
-		 * System.out.println(size + "");
-		 */
-	}
 }

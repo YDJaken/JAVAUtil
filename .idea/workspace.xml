@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/com/dy/Util/OBJUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/Util/OBJUtil.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,6 +69,8 @@
       <workItem from="1567996298850" duration="760000" />
       <workItem from="1568080903073" duration="630000" />
       <workItem from="1568254487489" duration="2008000" />
+      <workItem from="1568595489805" duration="72000" />
+      <workItem from="1568598147648" duration="1343000" />
     </task>
     <servers />
   </component>

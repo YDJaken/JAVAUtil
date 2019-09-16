@@ -33,8 +33,12 @@ class OBJUtil {
 	}
 
 	public static void main(String[] args) {
-		ObjectFile tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\Tile_+001_+006\\Tile_+001_+006.obj");
-		System.out.println(OBJUtil.computeArea(tmp));
+		ObjectFile tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2.obj");
+		System.out.println("2.obj: " + OBJUtil.computeArea(tmp));
+		tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2-2.obj");
+		System.out.println("2-2.obj: " + OBJUtil.computeArea(tmp));
+		tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2-box.obj");
+		System.out.println("2-box.obj: " + OBJUtil.computeArea(tmp));
 	}
 
 }
@@ -80,13 +84,17 @@ class ObjectFile {
 		LinkedList<ModelFaceIndex[]> modelFaceIndex = new LinkedList<ModelFaceIndex[]>();
 		for (int i = 0; i < splited.length; i++) {
 			String tmp = splited[i];
-			String target = tmp.substring(0, tmp.indexOf(" "));
+			int targetIndex = tmp.indexOf(" ");
+			if (targetIndex == -1) {
+				continue;
+			}
+			String target = tmp.substring(0, targetIndex);
 			switch (target) {
 			case "v":
-				geometricVertices.push(Point3D.fromString(tmp.substring(2)));
+				geometricVertices.add(Point3D.fromString(tmp.substring(2)));
 				break;
 			case "f":
-				modelFaceIndex.push(ModelFaceIndex.fromFaceIndexString(tmp));
+				modelFaceIndex.add(ModelFaceIndex.fromFaceIndexString(tmp));
 				break;
 			}
 		}

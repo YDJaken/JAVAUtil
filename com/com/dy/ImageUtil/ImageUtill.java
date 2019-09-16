@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -20,11 +22,16 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
+import com.adobe.internal.xmp.XMPException;
+import com.adobe.internal.xmp.XMPMeta;
+import com.adobe.internal.xmp.XMPMetaFactory;
+import com.adobe.internal.xmp.options.SerializeOptions;
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
+import com.drew.metadata.xmp.XmpDirectory;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -422,10 +429,10 @@ public class ImageUtill {
 
 	public static void main(String[] args) {
 
-//		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
-//		if (!iw.hasNext())
-//			return;
-//		ImageWriter writer = iw.next();
+		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
+		if (!iw.hasNext())
+			return;
+		ImageWriter writer = iw.next();
 //
 //		Iterator<ImageReader> ir = ImageIO.getImageReadersByFormatName("jpeg");
 //		if (!ir.hasNext())
@@ -447,18 +454,57 @@ public class ImageUtill {
 			Iterator<Directory> it = its.iterator();
 			while (it.hasNext()) {
 				Directory tmp = it.next();
-				Collection<Tag> tags = tmp.getTags();
-				Iterator<Tag> tag = tags.iterator();
-				while (tag.hasNext()) {
-					Tag tmpTag = tag.next();
+				XmpDirectory tar = null;
+				try {
+					tar = (XmpDirectory) tmp;
+				} catch (Exception e) {
 
-					System.out.println(
-							"Description:" + tmpTag.getDescription() + ", DirectoryName:" + tmpTag.getDirectoryName()
-									+ " ,TagName:" + tmpTag.getTagName() + ",TagType:" + tmpTag.getTagType());
 				}
+				if (tar != null) {
+					XMPMeta meta = tar.getXMPMeta();
 
+					Map<String, String> properties = tar.getXmpProperties();
+					properties.forEach((key, value) -> {
+						System.out.println("		key:" + key + "		,value:" + value);
+					});
+					System.out.println("		-----------------------------------------------");
+					try {
+						System.out.println("			drone-dji:FlightPitchDegree原为: "+meta.getPropertyDouble("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree")+", 修改为: 35.0");
+						meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree", 35.0);
+					} catch (XMPException e1) {
+						e1.printStackTrace();
+					}
+					SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
+					try {
+						//获取元数据的buffer放入图片文件
+						byte[] after = XMPMetaFactory.serializeToBuffer(meta, so);
+						meta = XMPMetaFactory.parseFromBuffer(after);
+						System.out.println("		-----------------------------------------------");
+						System.out.println("			drone-dji:FlightPitchDegree现为: "+meta.getPropertyDouble("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree"));
+						System.out.println("		-----------------------------------------------");
+						properties = tar.getXmpProperties();
+						properties.forEach((key, value) -> {
+							System.out.println("		key:" + key + "		,value:" + value);
+						});
+					} catch (XMPException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Collection<Tag> tags = tmp.getTags();
+					Iterator<Tag> tag = tags.iterator();
+					while (tag.hasNext()) {
+						Tag tmpTag = tag.next();
+
+						System.out.println(tmpTag.toString());
+						System.out.println("Description:" + tmpTag.getDescription() + ", DirectoryName:"
+								+ tmpTag.getDirectoryName() + " ,TagName:" + tmpTag.getTagName() + ",TagType:"
+								+ tmpTag.getTagType());
+					}
+				}
+//				writer.write(streamMetadata, image, param);
 			}
 
+			
 		} catch (JpegProcessingException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

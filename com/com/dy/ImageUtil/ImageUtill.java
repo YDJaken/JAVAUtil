@@ -7,9 +7,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -20,6 +20,11 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -380,17 +385,6 @@ public class ImageUtill {
 		image.flush();
 		fos.close();
 		return image;
-//		TIFFDecodeParam decodeParam = new TIFFDecodeParam();
-//		decodeParam.setJPEGDecompressYCbCrToRGB(false);
-//		ImageDecoder decoder = ImageCodec.createImageDecoder("TIFF", new FileInputStream(new File("")), decodeParam);
-//		RenderedImage image = decoder.decodeAsRenderedImage();
-////		JPEGDecodeParam decodeParam = new JPEGDecodeParam();
-////		ImageDecoder decoder = ImageCodec.createImageDecoder("JPEG", new FileInputStream(new File("")), decodeParam);
-////		RenderedImage image = decoder.decodeAsRenderedImage();
-//		JPEGEncodeParam encoderParam = new JPEGEncodeParam();
-//		encoderParam.setQuality(0.75f);
-//		ImageEncoder encoder = ImageCodec.createImageEncoder("JPEG", new FileOutputStream(new File("")), encoderParam);
-//		encoder.encode(buf);
 	}
 
 	/**
@@ -420,15 +414,6 @@ public class ImageUtill {
 				fio.write(modified);
 				fio.flush();
 				fio.close();
-//				JPEGEncodeParam  enparam = new JPEGEncodeParam();
-////				JPEGImageEncoder encoder = new JPEGImageEncoder(, enparam);
-//				Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
-//				if (!iw.hasNext())
-//					continue;
-//				ImageWriter writer = iw.next();
-//				JPEGImageWriteParam writeParams = (JPEGImageWriteParam)writer.getDefaultWriteParam();
-//				writeParams.setCompressionQuality(0.7f);
-//				ImageIO.write(tempImage, "jpg", new File(output + target + "_" + i + ".jpg"));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -436,6 +421,47 @@ public class ImageUtill {
 	}
 
 	public static void main(String[] args) {
-		ImageUtill.resizeAndCompress();
+
+//		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
+//		if (!iw.hasNext())
+//			return;
+//		ImageWriter writer = iw.next();
+//
+//		Iterator<ImageReader> ir = ImageIO.getImageReadersByFormatName("jpeg");
+//		if (!ir.hasNext())
+//			return;
+//		ImageReader reader = ir.next();
+//		try {
+//			reader.setInput(ImageIO.createImageInputStream());
+//
+//			
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+		File jpegFile = new File("C:\\Users\\hp\\Desktop\\DJI_0010.JPG");
+		try {
+			Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
+			Iterable<Directory> its = metadata.getDirectories();
+			Iterator<Directory> it = its.iterator();
+			while (it.hasNext()) {
+				Directory tmp = it.next();
+				Collection<Tag> tags = tmp.getTags();
+				Iterator<Tag> tag = tags.iterator();
+				while (tag.hasNext()) {
+					Tag tmpTag = tag.next();
+
+					System.out.println(
+							"Description:" + tmpTag.getDescription() + ", DirectoryName:" + tmpTag.getDirectoryName()
+									+ " ,TagName:" + tmpTag.getTagName() + ",TagType:" + tmpTag.getTagType());
+				}
+
+			}
+
+		} catch (JpegProcessingException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

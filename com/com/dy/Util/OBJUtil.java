@@ -25,8 +25,8 @@ class OBJUtil {
 			if (tmp.length != 3) {
 				throw new Error("ObjectFile is not valid!");
 			}
-			ret += Triangle.computeArea(geometricVertices[tmp[0].verticeIndex - 1], geometricVertices[tmp[1].verticeIndex - 1],
-					geometricVertices[tmp[2].verticeIndex - 1]);
+			ret += Triangle.computeArea(geometricVertices[tmp[0].verticeIndex], geometricVertices[tmp[1].verticeIndex],
+					geometricVertices[tmp[2].verticeIndex]);
 
 		}
 		return ret;
@@ -129,11 +129,11 @@ class ModelFaceIndex {
 		if (length > 3 || length < 1) {
 			throw new Error("Input String is not valid!");
 		}
-		ret.verticeIndex = Integer.parseUnsignedInt(aim[0]);
+		ret.verticeIndex = Integer.parseUnsignedInt(aim[0]) - 1;
 		if (length > 1) {
-			ret.vtIndex = Integer.parseUnsignedInt(aim[1]);
+			ret.vtIndex = Integer.parseUnsignedInt(aim[1]) - 1;
 			if (length > 2) {
-				ret.vnIndex = Integer.parseUnsignedInt(aim[2]);
+				ret.vnIndex = Integer.parseUnsignedInt(aim[2]) - 1;
 			}
 		}
 

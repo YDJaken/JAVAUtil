@@ -3,11 +3,13 @@ package com.dy.ImageUtil;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,8 +32,30 @@ import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import com.drew.metadata.xmp.XmpDirectory;
+
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.common.bytesource.ByteSource;
+import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
+import org.apache.commons.imaging.formats.jpeg.xmp.JpegXmpRewriter;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.common.ImageMetadata.ImageMetadataItem;
+import org.apache.commons.imaging.common.RationalNumber;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -305,208 +329,132 @@ public class ImageUtill {
 	}
 
 	/**
-	 * 修改图片的DPI(jpeg版)
+	 * 设置图片的经度,纬度,高度
 	 * 
-	 * @param image
-	 * @param dpi
-	 * @return
+	 * @param jpegImageFile
+	 * @param jpegMetadata
+	 * @param dst
+	 * @param longitude
+	 * @param latitude
+	 * @param height
 	 * @throws IOException
+	 * @throws ImageReadException
+	 * @throws ImageWriteException
 	 */
-	public static byte[] setImageDPI(File f, BufferedImage image, int dpi, float quality) throws IOException {
-		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
-		if (!iw.hasNext())
-			return null;
-		ImageWriter writer = iw.next();
+	public void setExifGPSTag(final File jpegImageFile, final JpegImageMetadata jpegMetadata, final File dst,
+			final double longitude, final double latitude, final double height)
+			throws IOException, ImageReadException, ImageWriteException {
+		try (FileOutputStream fos = new FileOutputStream(dst); OutputStream os = new BufferedOutputStream(fos)) {
+			TiffOutputSet outputSet = null;
 
-		Iterator<ImageReader> ir = ImageIO.getImageReadersByFormatName("jpeg");
-		if (!ir.hasNext())
-			return null;
-		ImageReader reader = ir.next();
-		reader.setInput(ImageIO.createImageInputStream(f));
+			if (jpegMetadata != null) {
+				final TiffImageMetadata exif = jpegMetadata.getExif();
 
-		ImageWriteParam writeParams = writer.getDefaultWriteParam();
-		writeParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-		// 调整图片质量
-		writeParams.setCompressionQuality(quality);
-
-		IIOMetadata data = writer.getDefaultImageMetadata(new ImageTypeSpecifier(image), writeParams);
-		if (data.isReadOnly() || !data.isStandardMetadataFormatSupported()) {
-			return null;
-		}
-		IIOMetadataNode tree = (IIOMetadataNode) data.getAsTree("javax_imageio_jpeg_image_1.0");
-//		String outS = printTree(tree);
-//		System.out.println(outS);
-//		File file = new File("D:\\FFOutput\\test.txt");
-//		PrintStream ps;
-//		try {
-//			ps = new PrintStream(new FileOutputStream(file));
-//			ps.write(outS.getBytes());
-//			ps.flush();
-//			ps.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-		if (tree.getElementsByTagName("app0JFIF").getLength() == 0)
-			return null;
-		IIOMetadataNode jfif = (IIOMetadataNode) tree.getElementsByTagName("app0JFIF").item(0);
-		jfif.setAttribute("Xdensity", dpi + "");
-		jfif.setAttribute("Ydensity", dpi + "");
-		jfif.setAttribute("resUnits", "1");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ImageOutputStream stream = null;
-		try {
-			stream = ImageIO.createImageOutputStream(out);
-			writer.setOutput(stream);
-			writer.write(data, new IIOImage(image, null, null), writeParams);
-		} finally {
-			stream.close();
-		}
-
-		return out.toByteArray();
-	}
-
-	public static String printTree(IIOMetadataNode tree) {
-		String ret = "";
-		if (tree.getAttributes().getLength() > 0) {
-			for (int j = 0; j < tree.getAttributes().getLength(); j++) {
-				IIOMetadataNode attribute = (IIOMetadataNode) tree.getAttributes().item(j);
-				ret += attribute.getNodeName() + "=" + attribute.getNodeValue() + ";\n";
+				if (exif != null) {
+					outputSet = exif.getOutputSet();
+				}
 			}
-		}
-		for (int i = 0; i < tree.getChildNodes().getLength(); i++) {
-			ret += ImageUtill.printTree((IIOMetadataNode) tree.getChildNodes().item(i));
-		}
-		return ret;
-	}
 
-	public BufferedImage test(BufferedImage image, File file, int dpi, float quality) throws IOException {
-		FileOutputStream fos = new FileOutputStream(file);
-		JPEGImageEncoder jpegEncoder = JPEGCodec.createJPEGEncoder(fos);
-		JPEGEncodeParam jpegEncodeParam = jpegEncoder.getDefaultJPEGEncodeParam(image);
-		jpegEncodeParam.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
-		jpegEncoder.setJPEGEncodeParam(jpegEncodeParam);
-		jpegEncodeParam.setQuality(quality, false);
-		jpegEncodeParam.setXDensity(dpi);
-		jpegEncodeParam.setYDensity(dpi);
-		jpegEncoder.encode(image, jpegEncodeParam);
-		image.flush();
-		fos.close();
-		return image;
+			if (null == outputSet) {
+				outputSet = new TiffOutputSet();
+			}
+
+			outputSet.setGPSInDegrees(longitude, latitude);
+
+			final TiffOutputDirectory GPSDirectory = outputSet.getGPSDirectory();
+			if (GPSDirectory != null) {
+				GPSDirectory.removeField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
+				GPSDirectory.add(GpsTagConstants.GPS_TAG_GPS_ALTITUDE, RationalNumber.valueOf(height));
+			}
+
+			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
+			os.flush();
+			os.close();
+			fos.flush();
+			fos.close();
+		}
 	}
 
 	/**
-	 * 更改图片分辨率并且压缩图片
+	 * 获取图片的XmpDirectory
+	 * 
+	 * @param metadata
+	 * @return
 	 */
-	public static void resizeAndCompress() {
-		int target = 1;
-		String imgurl = "D:\\FFOutput\\" + target + ".jpg";
-		String output = "D:\\FFOutput\\";
-		BufferedImage sourceImage;
-		int width = 358, height = 441;
-		float q = 0.6f;
-		try {
-			sourceImage = ImageUtill.getBufferedImage(imgurl);
-			for (int i = 1; i <= 13; i++) {
-				BufferedImage tempImage = new BufferedImage(width, height, i);
-				Graphics2D g2D = (Graphics2D) tempImage.getGraphics();
-				g2D.drawImage(sourceImage.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-				g2D.dispose();
-				byte[] modified = ImageUtill.setImageDPI(new File(imgurl), tempImage, 72, q);
-				if (modified == null)
-					continue;
-				File tmp = new File(output + target + "_" + i + ".jpg");
-				if (!tmp.exists())
-					tmp.createNewFile();
-				FileOutputStream fio = new FileOutputStream(tmp);
-				fio.write(modified);
-				fio.flush();
-				fio.close();
+	public static XmpDirectory loadXMPDirectory(final Metadata metadata) {
+		Iterable<Directory> its = metadata.getDirectories();
+		Iterator<Directory> it = its.iterator();
+		XmpDirectory tar = null;
+		while (it.hasNext()) {
+			Directory tmp = it.next();
+			try {
+				tar = (XmpDirectory) tmp;
+			} catch (Exception e) {
+				tar = null;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (tar != null) {
+				break;
+			}
 		}
+
+		return tar;
+	}
+
+	/**保存XMP数据
+	 * @param meta
+	 * @param so
+	 * @param source
+	 * @param des
+	 * @throws XMPException
+	 * @throws ImageReadException
+	 * @throws ImageWriteException
+	 * @throws IOException
+	 */
+	public static void saveXMP(final XMPMeta meta, final SerializeOptions so, final File source, final File des)
+			throws XMPException, ImageReadException, ImageWriteException, IOException {
+		final ByteSource byteSource = new ByteSourceFile(source);
+		FileOutputStream fos = new FileOutputStream(des);
+		OutputStream os = new BufferedOutputStream(fos);
+		String after = XMPMetaFactory.serializeToString(meta, so);
+		new JpegXmpRewriter().updateXmpXml(byteSource, os, after);
+		os.flush();
+		os.close();
+		fos.flush();
+		fos.close();
 	}
 
 	public static void main(String[] args) {
 
-		Iterator<ImageWriter> iw = ImageIO.getImageWritersByFormatName("jpeg");
-		if (!iw.hasNext())
-			return;
-		ImageWriter writer = iw.next();
-//
-//		Iterator<ImageReader> ir = ImageIO.getImageReadersByFormatName("jpeg");
-//		if (!ir.hasNext())
-//			return;
-//		ImageReader reader = ir.next();
-//		try {
-//			reader.setInput(ImageIO.createImageInputStream());
-//
-//			
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 		File jpegFile = new File("C:\\Users\\hp\\Desktop\\DJI_0010.JPG");
+		File writeFile = new File("C:\\Users\\hp\\Desktop\\DJI_0010_tmp.JPG");
+
 		try {
 			Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
-			Iterable<Directory> its = metadata.getDirectories();
-			Iterator<Directory> it = its.iterator();
-			while (it.hasNext()) {
-				Directory tmp = it.next();
-				XmpDirectory tar = null;
+			SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
+			XmpDirectory tar = loadXMPDirectory(metadata);
+			if (tar != null) {
+				XMPMeta meta = tar.getXMPMeta();
+				Map<String, String> properties = tar.getXmpProperties();
+				properties.forEach((key, value) -> {
+					System.out.println("		key:" + key + ",value:" + value);
+				});
+				System.out.println("		-----------------------------------------------");
 				try {
-					tar = (XmpDirectory) tmp;
-				} catch (Exception e) {
-
+					System.out.println("			drone-dji:FlightPitchDegree原为: "
+							+ meta.getPropertyDouble("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree")
+							+ ", 修改为: 35.0");
+					meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree", 35.0);
+				} catch (XMPException e1) {
+					e1.printStackTrace();
 				}
-				if (tar != null) {
-					XMPMeta meta = tar.getXMPMeta();
 
-					Map<String, String> properties = tar.getXmpProperties();
-					properties.forEach((key, value) -> {
-						System.out.println("		key:" + key + "		,value:" + value);
-					});
-					System.out.println("		-----------------------------------------------");
-					try {
-						System.out.println("			drone-dji:FlightPitchDegree原为: "+meta.getPropertyDouble("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree")+", 修改为: 35.0");
-						meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree", 35.0);
-					} catch (XMPException e1) {
-						e1.printStackTrace();
-					}
-					SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
-					try {
-						//获取元数据的buffer放入图片文件
-						byte[] after = XMPMetaFactory.serializeToBuffer(meta, so);
-						meta = XMPMetaFactory.parseFromBuffer(after);
-						System.out.println("		-----------------------------------------------");
-						System.out.println("			drone-dji:FlightPitchDegree现为: "+meta.getPropertyDouble("http://www.dji.com/drone-dji/1.0/", "drone-dji:FlightPitchDegree"));
-						System.out.println("		-----------------------------------------------");
-						properties = tar.getXmpProperties();
-						properties.forEach((key, value) -> {
-							System.out.println("		key:" + key + "		,value:" + value);
-						});
-					} catch (XMPException e) {
-						e.printStackTrace();
-					}
-				} else {
-					Collection<Tag> tags = tmp.getTags();
-					Iterator<Tag> tag = tags.iterator();
-					while (tag.hasNext()) {
-						Tag tmpTag = tag.next();
-
-						System.out.println(tmpTag.toString());
-						System.out.println("Description:" + tmpTag.getDescription() + ", DirectoryName:"
-								+ tmpTag.getDirectoryName() + " ,TagName:" + tmpTag.getTagName() + ",TagType:"
-								+ tmpTag.getTagType());
-					}
+				try {
+					saveXMP(meta,so,jpegFile,writeFile);
+				} catch (XMPException | ImageReadException | ImageWriteException e) {
+					e.printStackTrace();
 				}
-//				writer.write(streamMetadata, image, param);
 			}
-
-			
 		} catch (JpegProcessingException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

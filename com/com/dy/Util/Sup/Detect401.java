@@ -34,5 +34,4 @@ public class Detect401 {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
 }

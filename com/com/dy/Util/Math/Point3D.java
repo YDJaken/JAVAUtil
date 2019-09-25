@@ -2,11 +2,18 @@ package com.dy.Util.Math;
 
 public class Point3D {
 	private Double x, y, z;
+	public static final Point3D UNIT_X = new Point3D(1, 0, 0);
+	public static final Point3D UNIT_Y = new Point3D(0, 1, 0);
+	public static final Point3D UNIT_Z = new Point3D(0, 0, 1);
 
 	public Point3D(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	public Point3D() {
+		this(0, 0, 0);
 	}
 
 	public Double getX() {
@@ -36,53 +43,55 @@ public class Point3D {
 	public Point3D copy() {
 		return new Point3D(this.x, this.y, this.z);
 	}
-	
-	 /**
-     * 	标量乘
-     * @param scale
-     */
-    public void applyScaler(Double scale) {
-        this.x *= scale;
-        this.y *= scale;
-        this.z *= scale;
-    }
-    
-	
-    public String toString() {
-    	return "x: " + this.x + ", y:" + this.y + " ,z:" + this.z;
-    }
-    
-	/**
-     * 	获得-V
-     */
-    public void ngate() {
-    	this.x = -this.x;
-    	this.y = -this.y;
-    	this.z = -this.z;
-    }
-
-    /**
-     * 	向量加
-     * @param otherPoint
-     */
-    public void add(Point3D otherPoint) {
-        this.x = this.x + otherPoint.x;
-        this.y = this.y + otherPoint.y;
-        this.z = this.z + otherPoint.z;
-    }
-
-    /**
-     *	 向量减
-     * @param otherPoint
-     */
-    public void subtraction(Point3D otherPoint) {
-    	Point3D tmp = otherPoint.copy();
-        tmp.ngate();
-        this.add(tmp);
-    }
 
 	/**
-	 * 	外积 叉乘
+	 * 标量乘
+	 * 
+	 * @param scale
+	 */
+	public void applyScaler(Double scale) {
+		this.x *= scale;
+		this.y *= scale;
+		this.z *= scale;
+	}
+
+	public String toString() {
+		return "x: " + this.x + ", y:" + this.y + " ,z:" + this.z;
+	}
+
+	/**
+	 * 获得-V
+	 */
+	public void ngate() {
+		this.x = -this.x;
+		this.y = -this.y;
+		this.z = -this.z;
+	}
+
+	/**
+	 * 向量加
+	 * 
+	 * @param otherPoint
+	 */
+	public void add(Point3D otherPoint) {
+		this.x = this.x + otherPoint.x;
+		this.y = this.y + otherPoint.y;
+		this.z = this.z + otherPoint.z;
+	}
+
+	/**
+	 * 向量减
+	 * 
+	 * @param otherPoint
+	 */
+	public void subtraction(Point3D otherPoint) {
+		Point3D tmp = otherPoint.copy();
+		tmp.ngate();
+		this.add(tmp);
+	}
+
+	/**
+	 * 外积 叉乘
 	 * 
 	 * @param otherPoint
 	 */
@@ -95,7 +104,19 @@ public class Point3D {
 	}
 
 	/**
-	 *	 内积 点乘
+	 * 归一化
+	 * 
+	 * @return
+	 */
+	public Point3D normalize() {
+		double mag = Point3D.computeMagenitude(this);
+		Point3D ret = this.copy();
+		ret.applyScaler(1.0 / mag);
+		return ret;
+	}
+
+	/**
+	 * 内积 点乘
 	 * 
 	 * @param otherPoint
 	 * @return {number}
@@ -105,14 +126,15 @@ public class Point3D {
 	}
 
 	/**
-     *	 计算点的大小
-     * @param point
-     * @return {*}
-     */
-    public static Double computeMagenitude(Point3D point) {
-        return Math.sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-    }
-	
+	 * 计算点的大小
+	 * 
+	 * @param point
+	 * @return {*}
+	 */
+	public static Double computeMagenitude(Point3D point) {
+		return Math.sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
+	}
+
 	public static Point3D fromString(String position) {
 		return Point3D.fromString(position, " ");
 	}

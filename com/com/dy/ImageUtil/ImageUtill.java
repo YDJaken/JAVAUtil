@@ -459,7 +459,7 @@ public class ImageUtill {
 //							saveXMP(meta, so, jpegFile, writeFile);
 //						}
 						if (i == 6 || i == 2) {
-							setExifGPSTag(jpegFile, jpegMetadata, writeFile, 113.558169120253, 23.0632353814444, 27.7765723755583);
+							setExifGPSTag(jpegFile, jpegMetadata, writeFile, 113.558169120253, 23.0632353814444, 0);
 						}
 					}
 //					metadata = JpegMetadataReader.readMetadata(writeFile);
@@ -479,7 +479,6 @@ public class ImageUtill {
 					e.printStackTrace();
 				} 
 //				catch (XMPException e) {
-//					// TODO Auto-generated catch block
 //					e.printStackTrace();
 //				}
 			}

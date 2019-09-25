@@ -115,6 +115,10 @@ public class Point3D {
 		return ret;
 	}
 
+	public static Point3D multiplyComponents(Point3D left, Point3D right) {
+		return new Point3D(left.x * right.x, left.y * right.y, left.z * right.z);
+	}
+
 	/**
 	 * 内积 点乘
 	 * 

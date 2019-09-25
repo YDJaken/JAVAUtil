@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="" />
+    <list default="true" id="fcfba035-4faf-46a2-b5e3-bd2829cf248d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/com/dy/ImageUtil/ImageUtill.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/ImageUtil/ImageUtill.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/com/dy/Util/Math/Point3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/com/dy/Util/Math/Point3D.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +75,7 @@
       <workItem from="1568598147648" duration="2612000" />
       <workItem from="1568686419387" duration="657000" />
       <workItem from="1568873776487" duration="77000" />
+      <workItem from="1569390442290" duration="28000" />
     </task>
     <servers />
   </component>

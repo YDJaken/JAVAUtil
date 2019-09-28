@@ -40,6 +40,10 @@ public class Point3D {
 		this.z = z;
 	}
 
+	public Point3D clone() {
+		return this.copy();
+	}
+
 	public Point3D copy() {
 		return new Point3D(this.x, this.y, this.z);
 	}

@@ -78,7 +78,7 @@ public class Transforms {
 
 		Ellipsoid ellipsoid = Ellipsoid.WGS84;
 
-		Point3D scratchFirstCartesian, scratchSecondCartesian, scratchThirdCartesian = null;
+		Point3D scratchFirstCartesian = null, scratchSecondCartesian = null, scratchThirdCartesian = null;
 
 		if (MathUtil.equalsEpsilon(origin.getX(), 0.0, MathUtil.EPSILON14)
 				&& MathUtil.equalsEpsilon(origin.getY(), 0.0, MathUtil.EPSILON14)) {
@@ -127,9 +127,26 @@ public class Transforms {
 			scratchCalculateCartesian.clear();
 		}
 
-		return new Matrix4(scratchFirstCartesian.getX(), scratchFirstCartesian.getY(), scratchFirstCartesian.getZ(),
-				0.0, scratchSecondCartesian.getX(), scratchSecondCartesian.getY(), scratchSecondCartesian.getZ(), 0.0,
-				scratchThirdCartesian.getX(), scratchThirdCartesian.getY(), scratchThirdCartesian.getZ(), 0.0,
-				origin.getX(), origin.getY(), origin.getZ(), 1.0);
+		Matrix4 ret = new Matrix4();
+		double[] result = ret.getEntries();
+
+		result[0] = scratchFirstCartesian.getX();
+		result[1] = scratchFirstCartesian.getY();
+		result[2] = scratchFirstCartesian.getZ();
+		result[3] = 0.0;
+		result[4] = scratchSecondCartesian.getX();
+		result[5] = scratchSecondCartesian.getY();
+		result[6] = scratchSecondCartesian.getZ();
+		result[7] = 0.0;
+		result[8] = scratchThirdCartesian.getX();
+		result[9] = scratchThirdCartesian.getY();
+		result[10] = scratchThirdCartesian.getZ();
+		result[11] = 0.0;
+		result[12] = origin.getX();
+		result[13] = origin.getY();
+		result[14] = origin.getZ();
+		result[15] = 1.0;
+
+		return ret;
 	}
 }

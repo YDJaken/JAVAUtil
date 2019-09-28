@@ -24,9 +24,36 @@ public class MathUtil {
 	public static final double EPSILON20 = 0.00000000000000000001;
 	public static final double EPSILON21 = 0.000000000000000000001;
 
-	public static boolean equalsEpsilon(double a, double b, double epsilon) {
-		double differ = Math.abs(a - b);
-		return differ <= epsilon;
+	public static final double PI_OVER_TWO = Math.PI * 0.5;
+	public static final double TWO_PI = Math.PI * 2.0;
+
+	public static double zeroToTwoPi(double angle) {
+		double mod = MathUtil.mod(angle, TWO_PI);
+		if (Math.abs(mod) < EPSILON14 && Math.abs(angle) > EPSILON14) {
+			return TWO_PI;
+		}
+		return mod;
+	}
+
+	public static double mod(double m, double n) {
+		return ((m % n) + n) % n;
+	}
+
+	public static double acosClamped(double value) {
+		return Math.acos(MathUtil.clamp(value, -1.0, 1.0));
+	}
+
+	public static double clamp(double value, double min, double max) {
+		return value < min ? min : value > max ? max : value;
+	}
+
+	public static boolean equalsEpsilon(double left, double right, double epsilon) {
+		return MathUtil.equalsEpsilon(left, right, epsilon, epsilon);
+	}
+
+	public static boolean equalsEpsilon(double left, double right, double relativeEpsilon, double absoluteEpsilon) {
+		double absDiff = Math.abs(left - right);
+		return absDiff <= absoluteEpsilon || absDiff <= relativeEpsilon * Math.max(Math.abs(left), Math.abs(right));
 	}
 
 	public static int sign(double number) {

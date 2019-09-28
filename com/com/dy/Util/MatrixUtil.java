@@ -6,6 +6,7 @@ public class MatrixUtil {
 
 	/**
 	 * 随机生成一个矩阵
+	 * 
 	 * @param obj
 	 * @param cla
 	 * @param defalueValue
@@ -26,17 +27,18 @@ public class MatrixUtil {
 
 	/**
 	 * 将一维矩阵转换为二维矩阵
+	 * 
 	 * @param obj
 	 * @param cla
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static<T> T[][] reformate(T[] obj,Class<?> cla){
-		T[][] res = (T[][]) Array.newInstance(cla,  new int[] { 1, obj.length });
+	public static <T> T[][] reformate(T[] obj, Class<?> cla) {
+		T[][] res = (T[][]) Array.newInstance(cla, new int[] { 1, obj.length });
 		res[0] = obj;
 		return res;
 	}
-	
+
 	/**
 	 * 将二维矩阵行列数进行任意转换
 	 * 
@@ -72,7 +74,11 @@ public class MatrixUtil {
 		for (int i = 0; i < objs.length; i++) {
 			b.append('[');
 			for (int j = 0; j < objs[i].length; j++) {
-				b.append(objs[i][j].toString());
+				if (objs[i][j] != null) {
+					b.append(objs[i][j].toString());
+				} else {
+					b.append("null");
+				}
 				if (j != objs[i].length - 1) {
 					b.append(',');
 				}
@@ -88,5 +94,6 @@ public class MatrixUtil {
 
 	public static void main(String[] args) {
 
+		System.out.println(MatrixUtil.toString(MatrixUtil.generateMatrix(new Integer[10][10], Integer.class, new Integer(2)))); 
 	}
 }

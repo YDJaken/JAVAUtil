@@ -18,12 +18,16 @@ import com.adobe.internal.xmp.XMPException;
 import com.adobe.internal.xmp.XMPMeta;
 import com.adobe.internal.xmp.XMPMetaFactory;
 import com.adobe.internal.xmp.options.SerializeOptions;
+import com.adobe.internal.xmp.properties.XMPProperty;
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.lang.GeoLocation;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
+import com.drew.metadata.exif.GpsDirectory;
 import com.drew.metadata.xmp.XmpDirectory;
+import com.dy.Util.FileUtil;
 import com.dy.Util.Math.Point3D;
 import com.dy.Util.Math.RotationMatrix;
 
@@ -425,81 +429,156 @@ public class ImageUtill {
 	public static void main(String[] args) {
 
 //		File jpegFile = new File("C:\\Users\\hp\\Desktop\\air\\DJI_0001.JPG");
-		File jpegFile = new File("C:\\Users\\hp\\Desktop\\test\\DJI_0044.JPG");
-		File writeFile = new File("C:\\Users\\hp\\Desktop\\test\\DJI_0044_1.JPG");
+//		File jpegFile = new File("C:\\Users\\Yi Dong\\Desktop\\Air-2\\DJI_0044.JPG");
+//		File writeFile = new File("C:\\Users\\hp\\Desktop\\test\\DJI_0044_1.JPG");
 
-		try {
-			Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
-			printAllTags(metadata);
-			SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
-			XmpDirectory tar = loadXMPDirectory(metadata);
-			if (tar != null) {
-				XMPMeta meta = tar.getXMPMeta();
-				Map<String, String> properties = tar.getXmpProperties();
-				properties.forEach((key, value) -> {
-					System.out.println("		key:" + key + ",value:" + value);
-					if (key.indexOf("Degree") != -1) {
-						System.out.println("Radians:" + Math.toRadians(Double.parseDouble(value)));
+		File drictory = new File("C:\\Users\\Yi Dong\\Desktop\\Air-2");
+		File writeFile = new File("C:\\Users\\Yi Dong\\Desktop\\test\\log.txt");
+		if(!writeFile.exists()) {
+			try {
+				writeFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		File[] subs = FileUtil.loadsubFilesAsFile(drictory);
+
+		StringBuilder bu = new StringBuilder();
+		
+		for (int j = 0; j < subs.length; j++) {
+
+			File jpegFile = subs[j];
+
+			if (jpegFile.getName().indexOf("xml") != -1) {
+				continue;
+			}
+
+			try {
+				Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
+				printAllTags(metadata);
+				SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
+				XmpDirectory tar = loadXMPDirectory(metadata);
+				if (tar != null) {
+					XMPMeta meta = tar.getXMPMeta();
+					Map<String, String> properties = tar.getXmpProperties();
+					properties.forEach((key, value) -> {
+						System.out.println("		key:" + key + ",value:" + value);
+						if (key.indexOf("Degree") != -1) {
+							System.out.println("	Radians:" + Math.toRadians(Double.parseDouble(value)));
+						}
+					});
+					
+					GpsDirectory gps = metadata.getFirstDirectoryOfType(GpsDirectory.class);
+					
+					GeoLocation location = gps.getGeoLocation();
+					
+					double yaw = 0.0;
+					double pitch = 0.0;
+					double roll = 0.0;
+					double latitude = 0.0;
+					double longitude = 0.0;
+					double altitude = 0.0;
+					try {
+						yaw = Double.parseDouble(
+								meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalYawDegree")
+										.getValue());
+						pitch = Double.parseDouble(
+								meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalPitchDegree")
+										.getValue());
+						roll = Double.parseDouble(
+								meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalRollDegree")
+										.getValue());
+						latitude = Double.parseDouble(
+								meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:Latitude").getValue());
+						longitude = Double.parseDouble(meta
+								.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:Longitude").getValue());
+						altitude = Double.parseDouble(
+								meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:RelativeAltitude")
+										.getValue());
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (XMPException e) {
+						e.printStackTrace();
 					}
-				});
 
-				try {
-					double[] a = { 0.910096420657005, -0.414229030424482, 0.0117819973222213,
-							-0.237436859891045,-0.544549227316174, -0.804418968320886,
-							0.33962956684068, 0.729301343330006,-0.593945542911689 };
-					Point3D hpr = RotationMatrix.computeOrientationFromMatrixDegree(a,
-							new Point3D(113.558169120253, 25.0632353814444, 27.7765723755583));
-					meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalYawDegree", hpr.getX());
-					meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalPitchDegree",hpr.getY());
-					meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalRollDegree", hpr.getZ());
-					System.out.println(hpr);
-					System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalYawDegree"));
-					System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalPitchDegree"));
-					System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalRollDegree"));
-					double[] b = RotationMatrix.generate3DMatrix(Math.toRadians(113.558169120253), Math.toRadians(25.0632353814444), 27.7765723755583, Math.toRadians(hpr.getY()), Math.toRadians(hpr.getX()), Math.toRadians(hpr.getZ()));
+					double[] b = RotationMatrix.generate3DMatrix(Math.toRadians(longitude), Math.toRadians(latitude),
+							altitude, Math.toRadians(pitch), Math.toRadians(yaw), Math.toRadians(roll));
 					StringBuilder builder = new StringBuilder();
+					builder.append("yaw: " + yaw+";pitch:" +pitch +";roll"+ roll+";latitude:"+latitude+";longitude:"+longitude+";altitude:"+altitude+"\r\n");
+					builder.append(jpegFile.getName() + ":");
 					builder.append("[");
-					for(int i = 0; i < b.length;i++) {
+					for (int i = 0; i < b.length; i++) {
 						builder.append(b[i]);
 						builder.append(",");
 					}
-					builder.append("]");
-					System.out.println(builder.toString());
-					saveXMP(meta, so, jpegFile, writeFile);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-				
-				System.out.println("		-----------------------------------------------");
-				try {
-					jpegFile = writeFile;
-					writeFile = new File("C:\\Users\\hp\\Desktop\\test\\DJI_0044_2.JPG");
-					final JpegImageMetadata jpegMetadata = (JpegImageMetadata) Imaging.getMetadata(jpegFile);
+					builder.append("]\r\n");
+					String write = builder.toString();
+					System.out.println(write);
+					bu.append(write);
 
-					setExifGPSTag(jpegFile, jpegMetadata, writeFile, 113.558169120253, 23.0632353814444,
-							27.7765723755583);
-					
-					metadata = JpegMetadataReader.readMetadata(writeFile);
-					tar = loadXMPDirectory(metadata);
-					if (tar != null) {
-						meta = tar.getXMPMeta();
-						properties = tar.getXmpProperties();
-						properties.forEach((key, value) -> {
-							System.out.println("		key:" + key + ",value:" + value);
-							if(key.indexOf("Degree")!= -1) {
-								System.out.println("Radians:" + Math.toRadians(Double.parseDouble(value)));
-								
-							}
-						});
-					}
-				} catch (ImageReadException | ImageWriteException e) {
-					e.printStackTrace();
+//					try {
+//						double[] a = { 0.910096420657005, -0.414229030424482, 0.0117819973222213,
+//								-0.237436859891045,-0.544549227316174, -0.804418968320886,
+//								0.33962956684068, 0.729301343330006,-0.593945542911689 };
+//						Point3D hpr = RotationMatrix.computeOrientationFromMatrixDegree(a,
+//								new Point3D(113.558169120253, 25.0632353814444, 27.7765723755583));
+//						meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalYawDegree", hpr.getX());
+//						meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalPitchDegree",hpr.getY());
+//						meta.setProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalRollDegree", hpr.getZ());
+//						System.out.println(hpr);
+//						System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalYawDegree"));
+//						System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalPitchDegree"));
+//						System.out.println(meta.getProperty("http://www.dji.com/drone-dji/1.0/", "drone-dji:GimbalRollDegree"));
+//						double[] b = RotationMatrix.generate3DMatrix(Math.toRadians(113.558169120253), Math.toRadians(25.0632353814444), 27.7765723755583, Math.toRadians(hpr.getY()), Math.toRadians(hpr.getX()), Math.toRadians(hpr.getZ()));
+//						StringBuilder builder = new StringBuilder();
+//						builder.append("[");
+//						for(int i = 0; i < b.length;i++) {
+//							builder.append(b[i]);
+//							builder.append(",");
+//						}
+//						builder.append("]");
+//						System.out.println(builder.toString());
+//						saveXMP(meta, so, jpegFile, writeFile);
+//					} catch (Exception e1) {
+//						e1.printStackTrace();
+//					}
+
+//					System.out.println("		-----------------------------------------------");
+//					try {
+//						jpegFile = writeFile;
+//						writeFile = new File("C:\\Users\\hp\\Desktop\\test\\DJI_0044_2.JPG");
+//						final JpegImageMetadata jpegMetadata = (JpegImageMetadata) Imaging.getMetadata(jpegFile);
+					//
+//						setExifGPSTag(jpegFile, jpegMetadata, writeFile, 113.558169120253, 23.0632353814444,
+//								27.7765723755583);
+//						
+//						metadata = JpegMetadataReader.readMetadata(writeFile);
+//						tar = loadXMPDirectory(metadata);
+//						if (tar != null) {
+//							meta = tar.getXMPMeta();
+//							properties = tar.getXmpProperties();
+//							properties.forEach((key, value) -> {
+//								System.out.println("		key:" + key + ",value:" + value);
+//								if(key.indexOf("Degree")!= -1) {
+//									System.out.println("Radians:" + Math.toRadians(Double.parseDouble(value)));
+//									
+//								}
+//							});
+//						}
+//					} catch (ImageReadException | ImageWriteException e) {
+//						e.printStackTrace();
+//					}
 				}
+			} catch (JpegProcessingException |
+
+					IOException e) {
+				e.printStackTrace();
 			}
-		} catch (JpegProcessingException |
 
-				IOException e) {
-			e.printStackTrace();
 		}
+		
+		FileUtil.writeString(writeFile, bu.toString());
+
 	}
 }

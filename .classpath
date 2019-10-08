@@ -8,6 +8,11 @@
 	<classpathentry kind="lib" path="lib/metadata-extractor-2.12.0.jar" sourcepath="C:/Users/hp/.m2/repository/com/drewnoakes/metadata-extractor/2.12.0/metadata-extractor-2.12.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-imaging-1.0-alpha1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_201"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-11.0.2">
+		<attributes>
+			<attribute name="module" value="true"/>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -304,6 +304,7 @@ public class FileUtil {
 			f.setWritable(true);
 			fileOutputStream = new FileOutputStream(f);
 			byte[] bytes = s.getBytes(File.separator.equals("/") ? "UTF-8" : "GBK");
+//			byte[] bytes = s.getBytes("UTF-8");
 			fileOutputStream.write(bytes, 0, bytes.length);
 			fileOutputStream.flush();
 			fileOutputStream.close();
@@ -319,6 +320,7 @@ public class FileUtil {
 		FileInputStream fio = null;
 		String ret = new String();
 		String encoding = File.separator.equals("/") ? "UTF-8" : "GBK";
+//		String encoding = "UTF-8";
 		try {
 			f.setReadable(true);
 			fio = new FileInputStream(f);

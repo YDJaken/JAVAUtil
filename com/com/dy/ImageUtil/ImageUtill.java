@@ -312,6 +312,17 @@ public class ImageUtill {
 		ImageIO.write(DestImage, format, new File(DestSrc));
 	}
 
+	public static void setExifGPSTag(final File jpegImageFile, final File dst, final double longitude,
+			final double latitude, final double height) throws IOException {
+		try {
+			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) Imaging.getMetadata(jpegImageFile);
+			setExifGPSTag(jpegImageFile, jpegMetadata, dst, longitude, latitude, height);
+		} catch (ImageReadException | ImageWriteException e) {
+			e.printStackTrace();
+			throw new IOException();
+		}
+	}
+
 	/**
 	 * 设置图片的经度,纬度,高度
 	 * 
@@ -434,7 +445,7 @@ public class ImageUtill {
 
 		File drictory = new File("C:\\Users\\Yi Dong\\Desktop\\Air-2");
 		File writeFile = new File("C:\\Users\\Yi Dong\\Desktop\\test\\log.txt");
-		if(!writeFile.exists()) {
+		if (!writeFile.exists()) {
 			try {
 				writeFile.createNewFile();
 			} catch (IOException e) {
@@ -445,7 +456,7 @@ public class ImageUtill {
 		File[] subs = FileUtil.loadsubFilesAsFile(drictory);
 
 		StringBuilder bu = new StringBuilder();
-		
+
 		for (int j = 0; j < subs.length; j++) {
 
 			File jpegFile = subs[j];
@@ -468,11 +479,11 @@ public class ImageUtill {
 							System.out.println("	Radians:" + Math.toRadians(Double.parseDouble(value)));
 						}
 					});
-					
+
 					GpsDirectory gps = metadata.getFirstDirectoryOfType(GpsDirectory.class);
-					
+
 					GeoLocation location = gps.getGeoLocation();
-					
+
 					double yaw = 0.0;
 					double pitch = 0.0;
 					double roll = 0.0;
@@ -505,7 +516,8 @@ public class ImageUtill {
 					double[] b = RotationMatrix.generate3DMatrix(Math.toRadians(longitude), Math.toRadians(latitude),
 							altitude, Math.toRadians(pitch), Math.toRadians(yaw), Math.toRadians(roll));
 					StringBuilder builder = new StringBuilder();
-					builder.append("yaw: " + yaw+";pitch:" +pitch +";roll"+ roll+";latitude:"+latitude+";longitude:"+longitude+";altitude:"+altitude+"\r\n");
+					builder.append("yaw: " + yaw + ";pitch:" + pitch + ";roll" + roll + ";latitude:" + latitude
+							+ ";longitude:" + longitude + ";altitude:" + altitude + "\r\n");
 					builder.append(jpegFile.getName() + ":");
 					builder.append("[");
 					for (int i = 0; i < b.length; i++) {
@@ -577,7 +589,7 @@ public class ImageUtill {
 			}
 
 		}
-		
+
 		FileUtil.writeString(writeFile, bu.toString());
 
 	}

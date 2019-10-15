@@ -25,5 +25,5 @@ JavaUtil.iml
 bin/
 .classpath
 .project
-.idae/
+.idea/
 .settings/

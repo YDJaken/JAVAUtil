@@ -15,26 +15,29 @@ public class ServletUtil {
 	public static String getRequestPayload(HttpServletRequest req) {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader reader = req.getReader();) {
+			if (!reader.ready()) {
+				return null;
+			}
 			char[] buff = new char[1024];
 			int len;
 			while ((len = reader.read(buff)) != -1) {
 				sb.append(buff, 0, len);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			return null;
 		}
-		return sb.toString();
+		return sb.length() > 0 ? sb.toString() : null;
 	}
 
 	public static void returnFile(File f, HttpServletResponse res) throws Exception {
-		if(FileUtil.isGzip(f)){
+		if (FileUtil.isGzip(f)) {
 			File p = f.getParentFile();
 			try {
 				File tmp = File.createTempFile("tmp", ".json", p);
 				boolean reslut = FileUtil.unGzipFile(f, tmp);
-				if(reslut == false){
+				if (reslut == false) {
 					throw new Exception("未成功解压缩gzip文件" + f.getPath() + f.getName());
-				}else{
+				} else {
 					f = tmp;
 				}
 			} catch (IOException e) {
@@ -74,5 +77,20 @@ public class ServletUtil {
 				}
 			}
 		}
+	}
+
+	public static Object getRequestParameter(HttpServletRequest request, String ID) {
+		Object data = request.getParameter(ID);
+		if (data == null) {
+			data = request.getAttribute(ID);
+			if (data == null) {
+				data = ServletUtil.getRequestPayload(request);
+			}
+		}
+		return data;
+	}
+
+	public static boolean isJsonString(String target) {
+		return target.indexOf("{") != -1;
 	}
 }

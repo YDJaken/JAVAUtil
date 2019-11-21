@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import com.dy.Util.Math.Point3D;
 import com.dy.Util.Math.Triangle;
 
-class OBJUtil {
+public class OBJUtil {
 
 	public static ObjectFile loadOBJFile(String path) {
 		return OBJUtil.loadOBJFile(new File(path));
@@ -16,6 +16,10 @@ class OBJUtil {
 		return ObjectFile.loadFromFile(f);
 	}
 
+	public static Double computeArea(String target) {
+		return OBJUtil.computeArea(OBJUtil.loadOBJFile(target));
+	}
+	
 	public static Double computeArea(ObjectFile target) throws Error {
 		Point3D[] geometricVertices = target.getGeometricVertices();
 		ModelFaceIndex[][] modelFaceIndex = target.getModelFaceIndex();
@@ -33,12 +37,10 @@ class OBJUtil {
 	}
 
 	public static void main(String[] args) {
-		ObjectFile tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2.obj");
-		System.out.println("2.obj: " + OBJUtil.computeArea(tmp));
-		tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2-2.obj");
-		System.out.println("2-2.obj: " + OBJUtil.computeArea(tmp));
-		tmp = OBJUtil.loadOBJFile("C:\\Users\\hp\\Desktop\\obj\\2-box.obj");
-		System.out.println("2-box.obj: " + OBJUtil.computeArea(tmp));
+		ObjectFile tmp = OBJUtil.loadOBJFile("G:\\obj\\3.obj");
+		System.out.println("3.obj: " + OBJUtil.computeArea(tmp));
+		tmp = OBJUtil.loadOBJFile("G:\\obj\\3-plane.obj");
+		System.out.println("3-plane.obj: " + OBJUtil.computeArea(tmp));
 	}
 
 }

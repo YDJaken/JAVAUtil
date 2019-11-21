@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -18,24 +17,19 @@ import com.adobe.internal.xmp.XMPException;
 import com.adobe.internal.xmp.XMPMeta;
 import com.adobe.internal.xmp.XMPMetaFactory;
 import com.adobe.internal.xmp.options.SerializeOptions;
-import com.adobe.internal.xmp.properties.XMPProperty;
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
-import com.drew.lang.GeoLocation;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-import com.drew.metadata.exif.GpsDirectory;
 import com.drew.metadata.xmp.XmpDirectory;
 import com.dy.Util.FileUtil;
-import com.dy.Util.Math.Point3D;
 import com.dy.Util.Math.RotationMatrix;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.jpeg.xmp.JpegXmpRewriter;
-import org.apache.commons.imaging.common.ImageMetadata.ImageMetadataItem;
 import org.apache.commons.imaging.common.RationalNumber;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
@@ -449,7 +443,6 @@ public class ImageUtill {
 			try {
 				writeFile.createNewFile();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -468,7 +461,6 @@ public class ImageUtill {
 			try {
 				Metadata metadata = JpegMetadataReader.readMetadata(jpegFile);
 				printAllTags(metadata);
-				SerializeOptions so = new SerializeOptions().setOmitPacketWrapper(true);
 				XmpDirectory tar = loadXMPDirectory(metadata);
 				if (tar != null) {
 					XMPMeta meta = tar.getXMPMeta();
@@ -479,10 +471,6 @@ public class ImageUtill {
 							System.out.println("	Radians:" + Math.toRadians(Double.parseDouble(value)));
 						}
 					});
-
-					GpsDirectory gps = metadata.getFirstDirectoryOfType(GpsDirectory.class);
-
-					GeoLocation location = gps.getGeoLocation();
 
 					double yaw = 0.0;
 					double pitch = 0.0;

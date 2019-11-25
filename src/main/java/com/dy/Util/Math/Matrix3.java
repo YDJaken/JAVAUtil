@@ -1,5 +1,7 @@
 package com.dy.Util.Math;
 
+import com.dy.Util.MathUtil;
+
 public class Matrix3 {
 	private double[] entries = new double[9];
 

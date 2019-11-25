@@ -1,5 +1,7 @@
 package com.dy.Util.Math;
 
+import com.dy.Util.MathUtil;
+
 public class Ellipsoid {
 
 	public static final Ellipsoid WGS84 = new Ellipsoid(6378137.0, 6378137.0, 6356752.3142451793);

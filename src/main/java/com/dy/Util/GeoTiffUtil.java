@@ -1,14 +1,15 @@
 package com.dy.Util;
 
+import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.IIOException;
 import javax.xml.parsers.SAXParser;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -24,6 +25,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
+import com.dy.Util.XMLUtil;
 import com.dy.Util.Sup.Config;
 
 import it.geosolutions.imageio.plugins.tiff.TIFFField;
@@ -65,13 +67,14 @@ public class GeoTiffUtil {
 		return finded;
 	}
 
-	public static Config loadIMGConfig(GridCoverage2D cov) throws IIOException {
+	public static Config loadIMGConfig(GridCoverage2D cov) throws SAXException, IOException {
 		return loadIMGConfig(cov, new Config());
 	}
 
-	public static Config loadIMGConfig(GridCoverage2D cov, Config config) throws IIOException {
+	public static Config loadIMGConfig(GridCoverage2D cov, Config config) throws SAXException, IOException {
 		loadMetadata(cov, config);
 		config.setConfig("CRS", "EPSG:4326");
+		config.setConfig("saveDate", new Date());
 		Envelope env = cov.getEnvelope();
 		GeneralDirectPosition lower = (GeneralDirectPosition) env.getLowerCorner();
 		GeneralDirectPosition upper = (GeneralDirectPosition) env.getUpperCorner();
@@ -82,7 +85,7 @@ public class GeoTiffUtil {
 		config.setConfig("MaxLAT", upper.getOrdinate(1));
 
 		config.setConfig("StartLON", lower.getOrdinate(0));
-		config.setConfig("StartLAT", lower.getOrdinate(1));
+		config.setConfig("StartLAT", upper.getOrdinate(1));
 
 		RenderedImage img = cov.getRenderedImage();
 		int imgWidth = img.getWidth();
@@ -93,10 +96,47 @@ public class GeoTiffUtil {
 		config.setConfig("imgHeight", imgHeight);
 		config.setConfig("differLON", differLON);
 		config.setConfig("differLAT", differLAT);
+//		Rectangle rec = loadRegion(80.6231689, -89, 82.6231689, 29.973449, config);
+//		rec.setSize(1, 1);
+//		Raster a = img.getData(rec);
+//		int[] data = new int[1];
+//		a.getPixel(rec.x, rec.y, data);
+//		Object obj = cov.evaluate(new DirectPosition2D(80.6231689, 29.973449));
 		return config;
 	}
 
-	private static void loadMetadata(GridCoverage2D cov, Config config) throws IIOException {
+	public static Rectangle loadRegion(final double minLon, final double minLat, final double maxLon,
+			final double maxLat, final Config config) {
+		double StartLON = (double) config.getConfig("StartLON");
+		double StartLAT = (double) config.getConfig("StartLAT");
+		double differLON = (double) config.getConfig("differLON");
+		double differLAT = (double) config.getConfig("differLAT");
+		int imgWidth = (int) config.getConfig("imgWidth");
+		int imgHeight = (int) config.getConfig("imgHeight");
+
+		int startX = (int) Math.floor((minLon - StartLON) / differLON);
+		if (startX < 0 || startX > imgWidth) {
+			return null;
+		}
+
+		int startY = (int) Math.floor((StartLAT - maxLat) / differLAT);
+		if (startY < 0 || startY > imgHeight) {
+			return null;
+		}
+
+		int endX = (int) Math.ceil((maxLon - StartLON) / differLON);
+		if (endX < 0 || endX > imgWidth || endX < startX) {
+			return null;
+		}
+		int endY = (int) Math.ceil((StartLAT - minLat) / differLAT);
+		if (endY < 0 || endY > imgHeight || endY < startY) {
+			return null;
+		}
+
+		return new Rectangle(startX, startY, endX - startX, endY - startY);
+	}
+
+	private static void loadMetadata(GridCoverage2D cov, Config config) throws SAXException, IOException {
 		Map<?, ?> map = cov.getProperties();
 		TIFFImageReader tifReader = (TIFFImageReader) map.get("JAI.ImageReader");
 		TIFFImageMetadata metaData = (TIFFImageMetadata) tifReader.getImageMetadata(0);
@@ -109,26 +149,18 @@ public class GeoTiffUtil {
 		String GDALMetadata = field.getValueAsString(0);
 
 		if (field != null) {
-			try {
-				SAXParser builder = XMLUtil.getNewSAXParser();
-				GDALMetaHandler handler = new GDALMetaHandler(config);
-				builder.parse(new ByteArrayInputStream(GDALMetadata.getBytes()), handler);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			SAXParser builder = XMLUtil.getNewSAXParser();
+			GDALMetaHandler handler = new GDALMetaHandler(config);
+			builder.parse(new ByteArrayInputStream(GDALMetadata.getBytes()), handler);
 		}
 	}
+
 }
 
 class GDALMetaHandler extends DefaultHandler2 {
 
 	private Config config;
 	private static final HashMap<String, String> GDALMetaConfig = new HashMap<String, String>() {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		{

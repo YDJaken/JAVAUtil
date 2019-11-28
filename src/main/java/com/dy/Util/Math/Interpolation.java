@@ -2,8 +2,7 @@ package com.dy.Util.Math;
 
 import com.dy.Util.Math.Interpolations.Bicubic;
 import com.dy.Util.Math.Interpolations.Bilinear;
-import com.dy.Util.Math.Interpolations.Biquadratic;
-import com.dy.Util.Math.Interpolations.Kriging;
+import com.dy.Util.Math.Interpolations.SimpleKriging;
 import com.dy.Util.Math.Interpolations.Linear;
 import com.dy.Util.Math.Interpolations.NearestNeighbour;
 
@@ -17,10 +16,8 @@ public abstract class Interpolation {
 			ret = Bilinear.getInstance();
 		} else if (interpolationMethodType.equals(Linear.getInterpolationMethod())) {
 			ret = Linear.getInstance();
-		} else if (interpolationMethodType.equals(Kriging.getInterpolationMethod())) {
-			ret = Kriging.getInstance();
-		} else if (interpolationMethodType.equals(Biquadratic.getInterpolationMethod())) {
-			ret = Biquadratic.getInstance();
+		} else if (interpolationMethodType.equals(SimpleKriging.getInterpolationMethod())) {
+			ret = SimpleKriging.getInstance();
 		} else if (interpolationMethodType.equals(Bicubic.getInterpolationMethod())) {
 			ret = Bicubic.getInstance();
 		}

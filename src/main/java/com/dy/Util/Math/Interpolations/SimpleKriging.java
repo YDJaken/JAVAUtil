@@ -2,15 +2,15 @@ package com.dy.Util.Math.Interpolations;
 
 import com.dy.Util.Math.Interpolation;
 
-public class Biquadratic extends Interpolation {
+public class SimpleKriging extends Interpolation {
 
-	private static Biquadratic interpolation = null;
+	private static SimpleKriging interpolation = null;
 
 	public static Interpolation getInstance() {
 		if (interpolation == null) {
-			synchronized (Biquadratic.class) {
+			synchronized (SimpleKriging.class) {
 				if (interpolation == null) {
-					interpolation = new Biquadratic();
+					interpolation = new SimpleKriging();
 				}
 			}
 		}
@@ -22,18 +22,16 @@ public class Biquadratic extends Interpolation {
 	}
 
 	public static String getInterpolationMethod() {
-		return "Biquadratic";
+		return "SimpleKriging";
 	}
 
 	@Override
 	public double interpolation(double[] input) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public float interpolation(float[] input) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

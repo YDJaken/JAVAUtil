@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 import javax.xml.parsers.SAXParser;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -19,7 +17,6 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.util.factory.Hints;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -53,18 +50,8 @@ public class GeoTiffUtil {
 	}
 
 	public static boolean CheckCRS(GridCoverage2D cov, String targetCRS) {
-		boolean finded = false;
 		CoordinateReferenceSystem crs = cov.getCoordinateReferenceSystem();
-		Set<ReferenceIdentifier> indentifiers = crs.getIdentifiers();
-		int size = indentifiers.size();
-		ReferenceIdentifier[] indentifiersA = indentifiers.toArray(new ReferenceIdentifier[size]);
-		for (int i = 0; i < size; i++) {
-			if (indentifiersA[i].toString().equals(targetCRS)) {
-				finded = true;
-				break;
-			}
-		}
-		return finded;
+		return CRSUtil.CheckCRS(crs, targetCRS);
 	}
 
 	public static Config loadIMGConfig(GridCoverage2D cov) throws SAXException, IOException {

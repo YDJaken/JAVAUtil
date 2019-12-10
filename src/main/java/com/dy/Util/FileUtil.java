@@ -297,14 +297,17 @@ public class FileUtil {
 	 * @param s
 	 * @return
 	 */
-
 	public static boolean writeString(File f, String s) {
+//		return writeString(f, s, File.separator.equals("/") ? "UTF-8" : "GBK");
+		return writeString(f, s, "UTF-8");
+	}
+
+	public static boolean writeString(File f, String s, String encoding) {
 		FileOutputStream fileOutputStream = null;
 		try {
 			f.setWritable(true);
 			fileOutputStream = new FileOutputStream(f);
-			byte[] bytes = s.getBytes(File.separator.equals("/") ? "UTF-8" : "GBK");
-//			byte[] bytes = s.getBytes("UTF-8");
+			byte[] bytes = s.getBytes(encoding);
 			fileOutputStream.write(bytes, 0, bytes.length);
 			fileOutputStream.flush();
 			fileOutputStream.close();
@@ -316,11 +319,9 @@ public class FileUtil {
 		return true;
 	}
 
-	public static String readString(File f) {
+	public static String readString(File f, String encoding) {
 		FileInputStream fio = null;
 		String ret = new String();
-		String encoding = File.separator.equals("/") ? "UTF-8" : "GBK";
-//		String encoding = "UTF-8";
 		try {
 			f.setReadable(true);
 			fio = new FileInputStream(f);
@@ -339,6 +340,11 @@ public class FileUtil {
 		}
 
 		return ret;
+	}
+
+	public static String readString(File f) {
+//		return readString(f,File.separator.equals("/") ? "UTF-8" : "GBK");
+		return readString(f, "UTF-8");
 	}
 
 	/**

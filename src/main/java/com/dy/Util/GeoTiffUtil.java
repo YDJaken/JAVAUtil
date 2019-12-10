@@ -1,11 +1,15 @@
 package com.dy.Util;
 
+//import java.awt.image.Raster;
+//import java.lang.reflect.Array;
+//import org.geotools.geometry.DirectPosition2D;
+
 import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.SAXParser;
@@ -35,7 +39,7 @@ public class GeoTiffUtil {
 	}
 
 	public static GridCoverage2D loadGeoTiff(String fileurl, Hints hints) throws IOException {
-		File rasterFile = new File("E:\\dem90.tif");
+		File rasterFile = new File(fileurl);
 		if (!rasterFile.exists() || !rasterFile.canRead()) {
 			return null;
 		}
@@ -61,7 +65,7 @@ public class GeoTiffUtil {
 	public static Config loadIMGConfig(GridCoverage2D cov, Config config) throws SAXException, IOException {
 		loadMetadata(cov, config);
 		config.setConfig("CRS", "EPSG:4326");
-		config.setConfig("saveDate", new Date());
+		config.setConfig("saveDate", new Date(new java.util.Date().getTime()));
 		Envelope env = cov.getEnvelope();
 		GeneralDirectPosition lower = (GeneralDirectPosition) env.getLowerCorner();
 		GeneralDirectPosition upper = (GeneralDirectPosition) env.getUpperCorner();
@@ -83,14 +87,20 @@ public class GeoTiffUtil {
 		config.setConfig("imgHeight", imgHeight);
 		config.setConfig("differLON", differLON);
 		config.setConfig("differLAT", differLAT);
+//		testSame(config, img, cov);
+		return config;
+	}
+
+//	private static void testSame(Config config, RenderedImage img, GridCoverage2D cov) {
 //		Rectangle rec = loadRegion(80.6231689, -89, 82.6231689, 29.973449, config);
 //		rec.setSize(1, 1);
 //		Raster a = img.getData(rec);
 //		int[] data = new int[1];
 //		a.getPixel(rec.x, rec.y, data);
+//		System.out.println(data[0]);
 //		Object obj = cov.evaluate(new DirectPosition2D(80.6231689, 29.973449));
-		return config;
-	}
+//		System.out.println(Array.get(obj, 0));
+//	}
 
 	public static Rectangle loadRegion(final double minLon, final double minLat, final double maxLon,
 			final double maxLat, final Config config) {
@@ -100,7 +110,12 @@ public class GeoTiffUtil {
 		double differLAT = (double) config.getConfig("differLAT");
 		int imgWidth = (int) config.getConfig("imgWidth");
 		int imgHeight = (int) config.getConfig("imgHeight");
+		return loadRegion(minLon, minLat, maxLon, maxLat, StartLON, StartLAT, differLON, differLAT, imgWidth,imgHeight);
+	}
 
+	public static Rectangle loadRegion(final double minLon, final double minLat, final double maxLon,
+			final double maxLat, final double StartLON, final double StartLAT, final double differLON,
+			final double differLAT, final int imgWidth, final int imgHeight) {
 		int startX = (int) Math.floor((minLon - StartLON) / differLON);
 		if (startX < 0 || startX > imgWidth) {
 			return null;

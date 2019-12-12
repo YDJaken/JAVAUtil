@@ -19,6 +19,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 public class ShapeGeoJSONUtil {
 
 	public static String shpToGeoJSON(final String shpFilePath) throws IOException {
@@ -103,16 +106,82 @@ public class ShapeGeoJSONUtil {
 		return features;
 	}
 
+	public static String shpToGeoJSONConverted(final String shpFilePath) throws IOException {
+		return shpToGeoJSONConverted(shpFilePath, "ISO-8859-1", 0, -1);
+	}
+
+	public static String shpToGeoJSONConverted(final String shpFilePath, final long offSet, final long Count)
+			throws IOException {
+		return shpToGeoJSONConverted(shpFilePath, "ISO-8859-1", offSet, Count);
+	}
+
+	public static String shpToGeoJSONConverted(final String shpFilePath, final String charset, final long offSet,
+			final long Count) throws IOException {
+		File shp = new File(shpFilePath);
+		if (!shp.exists()) {
+			return null;
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("url", shp.toURI().toURL());
+
+		ShapefileDataStore dataStore = (ShapefileDataStore) DataStoreFinder.getDataStore(map);
+		dataStore.setCharset(Charset.forName(charset));
+		String typeName = dataStore.getTypeNames()[0];
+
+		FeatureJSON fJSON = new FeatureJSON();
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(typeName);
+		Filter filter = Filter.INCLUDE;
+
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(filter);
+		SimpleFeature[] features = changeCRS(dataStore, collection, charset);
+		StringWriter writer = null;
+		StringBuffer sb = new StringBuffer();
+		try {
+			sb.append("{\"type\": \"FeatureCollection\",\"features\": [");
+			long i = 0;
+			long count = 0;
+			for (int j = 0; j < features.length; j++) {
+				if (i < offSet) {
+					i++;
+					continue;
+				}
+				SimpleFeature feature = features[j];
+				if (++count < Count || Count < 0) {
+					writer = new StringWriter();
+					fJSON.writeFeature(feature, writer);
+					String output = writer.toString();
+					JSONObject obj = JSON.parseObject(output);
+					JSONObjectUtil.convertJSON(obj);
+					output = obj.toJSONString();
+					sb.append(output);
+					if (j != features.length - 1)
+						sb.append(',');
+				} else {
+					writer = new StringWriter();
+					fJSON.writeFeature(feature, writer);
+					String output = writer.toString();
+					JSONObject obj = JSON.parseObject(output);
+					JSONObjectUtil.convertJSON(obj);
+					output = obj.toJSONString();
+					sb.append(output);
+					break;
+				}
+			}
+			sb.append("]}");
+		} finally {
+			dataStore.dispose();
+		}
+		return sb.toString();
+
+	}
+
 	public static void main(String[] args) {
 		try {
-			String tmp = shpToGeoJSON("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp");
+			String tmp = shpToGeoJSONConverted("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp");
 			File f = new File("H:\\boston" + File.separatorChar + "boston_buildings_utm19.json");
 			if (!f.exists())
 				f.createNewFile();
 			FileUtil.writeString(f, tmp);
-//			System.out.println(shpToGeoJSON("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp", 0, 10));
-//			System.out.println(shpToGeoJSON("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp", 5, 10));
-//			System.out.println(shpToGeoJSON("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp", 10, 10));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

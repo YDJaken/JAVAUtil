@@ -91,9 +91,4 @@ public class MatrixUtil {
 		b.append(']');
 		return b.toString();
 	}
-
-	public static void main(String[] args) {
-
-		System.out.println(MatrixUtil.toString(MatrixUtil.generateMatrix(new Integer[10][10], Integer.class, new Integer(2)))); 
-	}
 }

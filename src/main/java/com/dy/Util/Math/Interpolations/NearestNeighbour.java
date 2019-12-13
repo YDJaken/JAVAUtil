@@ -26,7 +26,7 @@ public class NearestNeighbour extends Interpolation {
 
 	@Override
 	public double interpolation(double[] input) {
-		if (input.length != 6)
+		if (input.length < 6)
 			return 0.0;
 		return interpolation(input[0], input[1], input[2], input[3], input[4], input[5]);
 	}
@@ -50,7 +50,7 @@ public class NearestNeighbour extends Interpolation {
 
 	@Override
 	public float interpolation(float[] input) {
-		if (input.length != 6)
+		if (input.length < 6)
 			return 0.0f;
 		return interpolation(input[0], input[1], input[2], input[3], input[4], input[5]);
 	}

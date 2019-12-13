@@ -27,7 +27,7 @@ public class Linear extends Interpolation {
 
 	@Override
 	public double interpolation(final double[] input) {
-		if (input.length != 3)
+		if (input.length < 3)
 			return 0.0;
 		return interpolation(input[0], input[1], input[2]);
 	}
@@ -38,7 +38,7 @@ public class Linear extends Interpolation {
 
 	@Override
 	public float interpolation(float[] input) {
-		if (input.length != 3)
+		if (input.length < 3)
 			return 0.0f;
 		return interpolation(input[0], input[1], input[2]);
 	}

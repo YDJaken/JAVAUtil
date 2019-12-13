@@ -12,8 +12,12 @@ public class Config {
 	public Object getConfig(String name) {
 		return config.get(name);
 	}
-	
+
 	public Object removeConfig(String name) {
 		return config.remove(name);
+	}
+
+	public void clear() {
+		config.clear();
 	}
 }

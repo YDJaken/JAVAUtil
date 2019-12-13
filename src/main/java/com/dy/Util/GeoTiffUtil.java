@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.SAXParser;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -28,12 +29,12 @@ import org.xml.sax.ext.DefaultHandler2;
 
 import com.dy.Util.XMLUtil;
 import com.dy.Util.Sup.Config;
-
 import it.geosolutions.imageio.plugins.tiff.TIFFField;
 import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageMetadata;
 import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageReader;
 
 public class GeoTiffUtil {
+
 	public static GridCoverage2D loadGeoTiff(String fileurl) throws IOException {
 		return loadGeoTiff(fileurl, new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 	}
@@ -110,7 +111,8 @@ public class GeoTiffUtil {
 		double differLAT = (double) config.getConfig("differLAT");
 		int imgWidth = (int) config.getConfig("imgWidth");
 		int imgHeight = (int) config.getConfig("imgHeight");
-		return loadRegion(minLon, minLat, maxLon, maxLat, StartLON, StartLAT, differLON, differLAT, imgWidth,imgHeight);
+		return loadRegion(minLon, minLat, maxLon, maxLat, StartLON, StartLAT, differLON, differLAT, imgWidth,
+				imgHeight);
 	}
 
 	public static Rectangle loadRegion(final double minLon, final double minLat, final double maxLon,

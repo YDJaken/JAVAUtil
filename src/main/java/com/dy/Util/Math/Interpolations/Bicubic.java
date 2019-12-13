@@ -27,8 +27,10 @@ public class Bicubic extends Interpolation {
 
 	@Override
 	public double interpolation(double[] input) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (input.length < 18)
+			return 0.0;
+		return interpolation(input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8],
+				input[9], input[10], input[11], input[12], input[13], input[14], input[15], input[16], input[17]);
 	}
 
 	public double interpolation(final double g00, final double g01, final double g02, final double g03,
@@ -69,8 +71,10 @@ public class Bicubic extends Interpolation {
 
 	@Override
 	public float interpolation(float[] input) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (input.length < 18)
+			return 0.0f;
+		return interpolation(input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8],
+				input[9], input[10], input[11], input[12], input[13], input[14], input[15], input[16], input[17]);
 	}
 
 	public float interpolation(final float g00, final float g01, final float g02, final float g03, final float g10,

@@ -42,6 +42,10 @@ public class GeoImageData {
 		this.latitude = latitude;
 		this.data = data;
 	}
+	
+	public void destory() {
+		this.data = null;
+	}
 
 	@Override
 	public String toString() {

@@ -49,6 +49,6 @@ public class GeoImageData {
 
 	@Override
 	public String toString() {
-		return "GeoImageData [longtitude=" + longtitude + ", latitude=" + latitude + ", data=" + data + "]";
+		return "{longtitude=" + longtitude + ", latitude=" + latitude + ", data=" + data.toString() + "}";
 	}
 }

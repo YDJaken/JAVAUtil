@@ -18,7 +18,7 @@ public class JSONObjectUtil {
 				return;
 			}
 			String encode = getEnCode(value);
-			if(encode!= null) {
+			if (encode != null) {
 				int index = obj.indexOf(value);
 				obj.set(index, encode);
 			}
@@ -28,7 +28,7 @@ public class JSONObjectUtil {
 	private static byte[] reduceBytes(byte[] input) {
 		LinkedList<Byte> ls = new LinkedList<>();
 		for (int i = 0; i < input.length; i++) {
-			if (input[i] != 0) {
+			if (input[i] != 0 || ls.size() != 0) {
 				ls.add(input[i]);
 			}
 		}
@@ -93,14 +93,14 @@ public class JSONObjectUtil {
 			}
 		}
 	}
-	
+
 	private static String getEnCode(Object value) {
 		String encode = null;
 		if (value instanceof BigDecimal) {
 			byte[] little = getBytes((BigDecimal) value);
 			if (little != null) {
 				encode = ConvertUtil.convertAll(little);
-				
+
 			}
 		} else if (value instanceof BigInteger) {
 			byte[] little = getBytes((BigInteger) value);
@@ -126,7 +126,7 @@ public class JSONObjectUtil {
 				return;
 			}
 			String encode = getEnCode(value);
-			if(encode!= null) {
+			if (encode != null) {
 				obj.put(key, encode);
 			}
 		});

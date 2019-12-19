@@ -1,10 +1,6 @@
 package com.dy.Util;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,8 +12,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.PlanarImage;
-
 import com.adobe.internal.xmp.XMPException;
 import com.adobe.internal.xmp.XMPMeta;
 import com.adobe.internal.xmp.XMPMetaFactory;
@@ -43,80 +37,6 @@ import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 
 public class ImageUtill {
-
-	public static Object loadImgData(PlanarImage img, Rectangle rec) throws IllegalArgumentException {
-		SampleModel model = img.getSampleModel();
-		int type = model.getDataType();
-		int bandNum = img.getNumBands();
-		long length = rec.height * rec.width * bandNum;
-		if (length > Integer.MAX_VALUE) {
-			throw new IllegalArgumentException("Request Region too big.");
-		}
-		int index = 0;
-		switch (type) {
-		case DataBuffer.TYPE_BYTE:
-//			return byte.class;
-			return null;
-		case DataBuffer.TYPE_DOUBLE:
-			Double[] ddata = new Double[(int) length];
-			while (index < rec.height) {
-				double[] tmpData = new double[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						ddata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-
-//			return double.class;
-			return ddata;
-		case DataBuffer.TYPE_FLOAT:
-			Float[] fdata = new Float[(int) length];
-			while (index < rec.height) {
-				float[] tmpData = new float[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						fdata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-//			return float.class;
-			return fdata;
-		case DataBuffer.TYPE_INT:
-		case DataBuffer.TYPE_SHORT:
-		case DataBuffer.TYPE_USHORT:
-			Integer[] idata = new Integer[(int) length];
-			while (index < rec.height) {
-				int[] tmpData = new int[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						idata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-//			return int.class;
-			return idata;
-		case DataBuffer.TYPE_UNDEFINED:
-			return null;
-		default:
-			return null;
-		}
-	}
 
 	/**
 	 * @param fileUrl

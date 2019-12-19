@@ -135,7 +135,6 @@ public class RotationMatrix {
 					new Point3D(113.558169120253, 25.0632353814444, 27.7765723755583));
 			System.out.println(hpr);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

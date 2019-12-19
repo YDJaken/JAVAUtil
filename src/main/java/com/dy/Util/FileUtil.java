@@ -19,6 +19,14 @@ import java.util.zip.ZipInputStream;
 
 public class FileUtil {
 
+	public static boolean isSubFile(final File base, final File current) {
+		if (base == null || current == null)
+			return false;
+		String basePath = base.getAbsolutePath();
+		String currentPath = current.getAbsolutePath();
+		return currentPath.indexOf(basePath) != -1;
+	}
+
 	/**
 	 * 将文件转换为字节 (大文件)
 	 * 
@@ -26,7 +34,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PriorityQueue<byte[]> toBytes(File f) throws IOException {
+	public static PriorityQueue<byte[]> toBytes(final File f) throws IOException {
 		long length = f.length();
 		int max = Integer.MAX_VALUE;
 		PriorityQueue<Integer> size = new PriorityQueue<>();
@@ -84,7 +92,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PriorityQueue<byte[]> toBytesSafe(File f) throws Exception {
+	public static PriorityQueue<byte[]> toBytesSafe(final File f) throws Exception {
 		long length = f.length();
 		int max = Integer.MAX_VALUE;
 		if ((length - max) > max) {
@@ -118,7 +126,6 @@ public class FileUtil {
 				ret.add(b);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			if (ra != null) {
@@ -128,7 +135,7 @@ public class FileUtil {
 		return ret;
 	}
 
-	public static boolean isGzip(File sourcedir) throws IOException {
+	public static boolean isGzip(final File sourcedir) throws IOException {
 		boolean ret = false;
 		FileInputStream fin = null;
 		try {

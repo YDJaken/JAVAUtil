@@ -1,11 +1,10 @@
 package com.dy.Util;
 
-//import java.awt.image.Raster;
-//import java.lang.reflect.Array;
-//import org.geotools.geometry.DirectPosition2D;
-
 import java.awt.Rectangle;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +12,7 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.media.jai.PlanarImage;
 import javax.xml.parsers.SAXParser;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -35,6 +35,81 @@ import it.geosolutions.imageioimpl.plugins.tiff.TIFFImageReader;
 
 public class GeoTiffUtil {
 
+	public static Object loadImgData(PlanarImage img, Rectangle rec) throws IllegalArgumentException {
+		SampleModel model = img.getSampleModel();
+		int type = model.getDataType();
+		int bandNum = img.getNumBands();
+		long length = rec.height * rec.width * bandNum;
+		if (length > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException("Request Region too big.");
+		}
+		int index = 0;
+		switch (type) {
+		case DataBuffer.TYPE_BYTE:
+//			return byte.class;
+			return null;
+		case DataBuffer.TYPE_DOUBLE:
+			Double[] ddata = new Double[(int) length];
+			while (index < rec.height) {
+				double[] tmpData = new double[rec.width * bandNum];
+				int startY = rec.y + index;
+				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
+				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
+				int topIndex = rec.width * bandNum * index;
+				for (int i = 0; i < tmpData.length; i += bandNum) {
+					for (int j = 0; j < bandNum; j++) {
+						ddata[topIndex + i + j] = tmpData[i + j];
+					}
+				}
+				index++;
+			}
+
+//			return double.class;
+			return ddata;
+		case DataBuffer.TYPE_FLOAT:
+			Float[] fdata = new Float[(int) length];
+			while (index < rec.height) {
+				float[] tmpData = new float[rec.width * bandNum];
+				int startY = rec.y + index;
+				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
+				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
+				int topIndex = rec.width * bandNum * index;
+				for (int i = 0; i < tmpData.length; i += bandNum) {
+					for (int j = 0; j < bandNum; j++) {
+						fdata[topIndex + i + j] = tmpData[i + j];
+					}
+				}
+				index++;
+			}
+//			return float.class;
+			return fdata;
+		case DataBuffer.TYPE_INT:
+		case DataBuffer.TYPE_SHORT:
+		case DataBuffer.TYPE_USHORT:
+			Integer[] idata = new Integer[(int) length];
+			while (index < rec.height) {
+				int[] tmpData = new int[rec.width * bandNum];
+				int startY = rec.y + index;
+				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
+				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
+				int topIndex = rec.width * bandNum * index;
+				for (int i = 0; i < tmpData.length; i += bandNum) {
+					for (int j = 0; j < bandNum; j++) {
+						idata[topIndex + i + j] = tmpData[i + j];
+					}
+				}
+				index++;
+			}
+//			return int.class;
+			return idata;
+		case DataBuffer.TYPE_UNDEFINED:
+			return null;
+		default:
+			return null;
+		}
+	}
+	
+	
 	public static GridCoverage2D loadGeoTiff(String fileurl) throws IOException {
 		return loadGeoTiff(fileurl, new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 	}

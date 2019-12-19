@@ -16,7 +16,6 @@ public class XMLUtil {
 		try {
 			parser = factory.newSAXParser();
 		} catch (ParserConfigurationException | SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return parser;

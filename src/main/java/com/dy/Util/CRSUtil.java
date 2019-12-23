@@ -29,6 +29,28 @@ public class CRSUtil {
 		}
 		return finded;
 	}
+	
+	public static MathTransform findTransform(final CoordinateReferenceSystem origin) {
+		if (EPSG4326 == null) {
+			try {
+				EPSG4326 = CRS.decode("EPSG:4326");
+			} catch (FactoryException e) {
+				e.printStackTrace();
+				EPSG4326 = null;
+				return null;
+			}
+		}
+		return findTransform(origin,EPSG4326);
+	}
+	
+	public static MathTransform findTransform(final CoordinateReferenceSystem origin,final CoordinateReferenceSystem dest) {
+		try {
+			return CRS.findMathTransform(origin, dest,true);
+		} catch (FactoryException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public static Geometry changeCRS(final CoordinateReferenceSystem origin,final CoordinateReferenceSystem dest, final Geometry sourcePoint) {
 		try {

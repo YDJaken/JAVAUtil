@@ -1,6 +1,5 @@
 package com.dy.Util;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.geometry.jts.JTS;
@@ -31,22 +30,28 @@ public class CRSUtil {
 		return finded;
 	}
 
-	public static Geometry changeCRS(final CoordinateReferenceSystem origin, final Geometry sourcePoint)
-			throws IOException {
+	public static Geometry changeCRS(final CoordinateReferenceSystem origin,final CoordinateReferenceSystem dest, final Geometry sourcePoint) {
+		try {
+			MathTransform transform = CRS.findMathTransform(origin, dest,true);
+			return JTS.transform(sourcePoint, transform);
+		} catch (FactoryException | MismatchedDimensionException | TransformException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	
+	public static Geometry changeCRS(final CoordinateReferenceSystem origin, final Geometry sourcePoint) {
 		if (EPSG4326 == null) {
 			try {
 				EPSG4326 = CRS.decode("EPSG:4326");
 			} catch (FactoryException e) {
 				e.printStackTrace();
 				EPSG4326 = null;
+				return null;
 			}
 		}
-		try {
-			MathTransform transform = CRS.findMathTransform(origin, EPSG4326,true);
-			return JTS.transform(sourcePoint, transform);
-		} catch (FactoryException | MismatchedDimensionException | TransformException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return changeCRS(origin,EPSG4326,sourcePoint);
 	}
 }

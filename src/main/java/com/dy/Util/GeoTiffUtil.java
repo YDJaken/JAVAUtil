@@ -1,9 +1,9 @@
 package com.dy.Util;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,7 +22,9 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.util.factory.Hints;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
@@ -38,78 +40,110 @@ public class GeoTiffUtil {
 	public static Object loadImgData(PlanarImage img, Rectangle rec) throws IllegalArgumentException {
 		SampleModel model = img.getSampleModel();
 		int type = model.getDataType();
-		int bandNum = img.getNumBands();
-		long length = rec.height * rec.width * bandNum;
-		if (length > Integer.MAX_VALUE) {
-			throw new IllegalArgumentException("Request Region too big.");
-		}
-		int index = 0;
 		switch (type) {
 		case DataBuffer.TYPE_BYTE:
-//			return byte.class;
 			return null;
 		case DataBuffer.TYPE_DOUBLE:
-			Double[] ddata = new Double[(int) length];
-			while (index < rec.height) {
-				double[] tmpData = new double[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						ddata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-
-//			return double.class;
-			return ddata;
+			return processData(model, img, rec, (double[]) null);
 		case DataBuffer.TYPE_FLOAT:
-			Float[] fdata = new Float[(int) length];
-			while (index < rec.height) {
-				float[] tmpData = new float[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						fdata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-//			return float.class;
-			return fdata;
+			return processData(model, img, rec, (float[]) null);
 		case DataBuffer.TYPE_INT:
 		case DataBuffer.TYPE_SHORT:
 		case DataBuffer.TYPE_USHORT:
-			Integer[] idata = new Integer[(int) length];
-			while (index < rec.height) {
-				int[] tmpData = new int[rec.width * bandNum];
-				int startY = rec.y + index;
-				Raster a = img.getTile(img.XToTileX(rec.x), img.YToTileY(startY));
-				a.getPixels(rec.x, startY, rec.width, 1, tmpData);
-				int topIndex = rec.width * bandNum * index;
-				for (int i = 0; i < tmpData.length; i += bandNum) {
-					for (int j = 0; j < bandNum; j++) {
-						idata[topIndex + i + j] = tmpData[i + j];
-					}
-				}
-				index++;
-			}
-//			return int.class;
-			return idata;
+			return processData(model, img, rec, (int[]) null);
 		case DataBuffer.TYPE_UNDEFINED:
 			return null;
 		default:
 			return null;
 		}
 	}
-	
-	
+
+	private static double[] processData(final SampleModel model, final PlanarImage img, final Rectangle rec,
+			double[] ddata) {
+		int bandNum = img.getNumBands();
+		if (ddata == null) {
+			long length = (long) rec.height * (long) rec.width * (long) bandNum;
+			if (length > Integer.MAX_VALUE) {
+				throw new IllegalArgumentException("Request Region too big.");
+			}
+			ddata = new double[(int) length];
+		}
+		Point[] indexs = img.getTileIndices(rec);
+		for (int i = 0; i < indexs.length; i++) {
+			Point target = indexs[i];
+			Raster start = img.getTile(target.x, target.y);
+			Rectangle bounds = rec.intersection(start.getBounds());
+			for (int j = 0; j < bounds.height; j++) {
+				double[] tmpData = new double[bounds.width * bandNum];
+				start.getPixels(bounds.x, bounds.y + j, bounds.width, 1, tmpData);
+				int topIndex = ((j + bounds.y - rec.y) * rec.width + (bounds.x - rec.x)) * bandNum;
+				for (int k = 0; k < tmpData.length; k += bandNum) {
+					for (int l = 0; l < bandNum; l++) {
+						ddata[topIndex + k + l] = tmpData[k + l];
+					}
+				}
+			}
+		}
+		return ddata;
+	}
+
+	private static float[] processData(final SampleModel model, final PlanarImage img, final Rectangle rec,
+			float[] fdata) {
+		int bandNum = img.getNumBands();
+		if (fdata == null) {
+			long length = (long) rec.height * (long) rec.width * (long) bandNum;
+			if (length > Integer.MAX_VALUE) {
+				throw new IllegalArgumentException("Request Region too big.");
+			}
+			fdata = new float[(int) length];
+		}
+		Point[] indexs = img.getTileIndices(rec);
+		for (int i = 0; i < indexs.length; i++) {
+			Point target = indexs[i];
+			Raster start = img.getTile(target.x, target.y);
+			Rectangle bounds = rec.intersection(start.getBounds());
+			for (int j = 0; j < bounds.height; j++) {
+				float[] tmpData = new float[bounds.width * bandNum];
+				start.getPixels(bounds.x, bounds.y + j, bounds.width, 1, tmpData);
+				int topIndex = ((j + bounds.y - rec.y) * rec.width + (bounds.x - rec.x)) * bandNum;
+				for (int k = 0; k < tmpData.length; k += bandNum) {
+					for (int l = 0; l < bandNum; l++) {
+						fdata[topIndex + k + l] = tmpData[k + l];
+					}
+				}
+			}
+		}
+		return fdata;
+	}
+
+	private static int[] processData(final SampleModel model, final PlanarImage img, final Rectangle rec, int[] idata) {
+		int bandNum = img.getNumBands();
+		if (idata == null) {
+			long length = (long) rec.height * (long) rec.width * (long) bandNum;
+			if (length > Integer.MAX_VALUE) {
+				throw new IllegalArgumentException("Request Region too big.");
+			}
+			idata = new int[(int) length];
+		}
+		Point[] indexs = img.getTileIndices(rec);
+		for (int i = 0; i < indexs.length; i++) {
+			Point target = indexs[i];
+			Raster start = img.getTile(target.x, target.y);
+			Rectangle bounds = rec.intersection(start.getBounds());
+			for (int j = 0; j < bounds.height; j++) {
+				int[] tmpData = new int[bounds.width * bandNum];
+				start.getPixels(bounds.x, bounds.y + j, bounds.width, 1, tmpData);
+				int topIndex = ((j + bounds.y - rec.y) * rec.width + (bounds.x - rec.x)) * bandNum;
+				for (int k = 0; k < tmpData.length; k += bandNum) {
+					for (int l = 0; l < bandNum; l++) {
+						idata[topIndex + k + l] = tmpData[k + l];
+					}
+				}
+			}
+		}
+		return idata;
+	}
+
 	public static GridCoverage2D loadGeoTiff(String fileurl) throws IOException {
 		return loadGeoTiff(fileurl, new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 	}
@@ -134,33 +168,35 @@ public class GeoTiffUtil {
 		return CRSUtil.CheckCRS(crs, targetCRS);
 	}
 
-	public static Config loadIMGConfig(GridCoverage2D cov) throws SAXException, IOException {
+	public static Config loadIMGConfig(GridCoverage2D cov)
+			throws SAXException, IOException, MismatchedDimensionException, TransformException {
 		return loadIMGConfig(cov, new Config());
 	}
 
-	public static Config loadIMGConfig(GridCoverage2D cov, Config config) throws SAXException, IOException {
+	public static Config loadIMGConfig(GridCoverage2D cov, Config config)
+			throws SAXException, IOException, MismatchedDimensionException, TransformException {
 		loadMetadata(cov, config);
-		config.setConfig("CRS", "EPSG:4326");
+		config.setConfig("CRS", cov.getCoordinateReferenceSystem().toWKT());
 		config.setConfig("saveDate", new Date(new java.util.Date().getTime()));
 		Envelope env = cov.getEnvelope();
 		GeneralDirectPosition lower = (GeneralDirectPosition) env.getLowerCorner();
 		GeneralDirectPosition upper = (GeneralDirectPosition) env.getUpperCorner();
+		
 		config.setConfig("MinLON", lower.getOrdinate(0));
 		config.setConfig("MinLAT", lower.getOrdinate(1));
-
 		config.setConfig("MaxLON", upper.getOrdinate(0));
 		config.setConfig("MaxLAT", upper.getOrdinate(1));
+		config.setConfig("StartLON", config.getConfig("MinLON"));
+		config.setConfig("StartLAT", config.getConfig("MaxLAT"));
 
-		config.setConfig("StartLON", lower.getOrdinate(0));
-		config.setConfig("StartLAT", upper.getOrdinate(1));
-
-		RenderedImage img = cov.getRenderedImage();
+		PlanarImage img = (PlanarImage) cov.getRenderedImage();
 		int imgWidth = img.getWidth();
 		int imgHeight = img.getHeight();
-		double differLON = (upper.getOrdinate(0) - lower.getOrdinate(0)) / imgWidth;
-		double differLAT = (upper.getOrdinate(1) - lower.getOrdinate(1)) / imgHeight;
+		double differLON = ((double) config.getConfig("MaxLON") - (double) config.getConfig("MinLON")) / imgWidth;
+		double differLAT = ((double) config.getConfig("MaxLAT") - (double) config.getConfig("MinLAT")) / imgHeight;
 		config.setConfig("imgWidth", imgWidth);
 		config.setConfig("imgHeight", imgHeight);
+		config.setConfig("imgBrandNumber", img.getNumBands());
 		config.setConfig("differLON", differLON);
 		config.setConfig("differLAT", differLAT);
 //		testSame(config, img, cov);
@@ -225,9 +261,9 @@ public class GeoTiffUtil {
 
 		// GDALMetadata
 		field = metaData.getTIFFField(42112);
-		String GDALMetadata = field.getValueAsString(0);
 
 		if (field != null) {
+			String GDALMetadata = field.getValueAsString(0);
 			SAXParser builder = XMLUtil.getNewSAXParser();
 			GDALMetaHandler handler = new GDALMetaHandler(config);
 			builder.parse(new ByteArrayInputStream(GDALMetadata.getBytes()), handler);

@@ -40,7 +40,7 @@ public class CRSUtil {
 				return null;
 			}
 		}
-		return findTransform(origin,EPSG4326);
+		return findTransform(EPSG4326,origin);
 	}
 	
 	public static MathTransform findTransform(final CoordinateReferenceSystem origin,final CoordinateReferenceSystem dest) {

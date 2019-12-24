@@ -24,6 +24,7 @@ import org.geotools.util.factory.Hints;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -176,7 +177,12 @@ public class GeoTiffUtil {
 	public static Config loadIMGConfig(GridCoverage2D cov, Config config)
 			throws SAXException, IOException, MismatchedDimensionException, TransformException {
 		loadMetadata(cov, config);
-		config.setConfig("CRS", cov.getCoordinateReferenceSystem().toWKT());
+		CoordinateReferenceSystem CRS = cov.getCoordinateReferenceSystem();
+		MathTransform transform = CRSUtil.findTransform(CRS);
+		if(transform == null) {
+			throw new IllegalArgumentException("Can't find a transform from WGS84(EPSG:4326) to "+ CRS.getName().toString()+ ".");
+		}
+		config.setConfig("CRS", CRS.toWKT());
 		config.setConfig("saveDate", new Date(new java.util.Date().getTime()));
 		Envelope env = cov.getEnvelope();
 		GeneralDirectPosition lower = (GeneralDirectPosition) env.getLowerCorner();

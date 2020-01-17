@@ -177,8 +177,10 @@ public class ShapeGeoJSONUtil {
 
 	public static void main(String[] args) {
 		try {
-			String tmp = shpToGeoJSONConverted("H:\\boston" + File.separatorChar + "boston_buildings_utm19.shp");
-			File f = new File("H:\\boston" + File.separatorChar + "boston_buildings_utm19.json");
+			String tmp = shpToGeoJSON("D:" + File.separatorChar + "工作文档" + File.separatorChar + "shp文件" + File.separatorChar + "china-latest-shp-water"
+					+ File.separatorChar + "gis_osm_waterways_free_1.shp");
+			File f = new File("D:" + File.separatorChar + "工作文档" + File.separatorChar + "shp文件" + File.separatorChar + "china-latest-shp-water"
+					+ File.separatorChar + "gis_osm_waterways_free_1.json");
 			if (!f.exists())
 				f.createNewFile();
 			FileUtil.writeString(f, tmp);

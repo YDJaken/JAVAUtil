@@ -9,10 +9,6 @@ public class ConvertUtil {
 		String cover = convertAll(a.getBytes("UTF-8"));
 		System.out.println(cover);
 		System.out.println(new String(unConvertAll(cover),"UTF-8"));
-//		a = "dem90.tif";
-//		cover = convertAll(a.getBytes("UTF-8"));
-//		System.out.println(cover);
-//		System.out.println(new String(unConvertAll(cover),"UTF-8"));
 	}
 
 	private static final byte ZERO_BYTE = -128;

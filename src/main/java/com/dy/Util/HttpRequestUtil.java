@@ -1,9 +1,12 @@
 package com.dy.Util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dy.Util.Sup.Detect401;
 
 /**
@@ -26,18 +30,103 @@ public class HttpRequestUtil {
 	 * @return
 	 */
 	public static Detect401 postDownTerrain(String path, File file) {
-		return HttpRequestUtil.postDownTerrain(path,"", file, 30000);
-	}
-	
-	public static Detect401 postDownTerrain(String path ,String token, File file) {
-		return HttpRequestUtil.postDownTerrain(path,token, file, 30000);
-	}
-	
-	public static Detect401 postDownTerrain(String path , File file,int readTime) {
-		return HttpRequestUtil.postDownTerrain(path,"", file, 30000);
+		return HttpRequestUtil.postDownTerrain(path, "", file, 30000);
 	}
 
-	public static Detect401 postDownTerrain(String path ,String token, File file, int readTime) {
+	public static Detect401 postDownTerrain(String path, String token, File file) {
+		return HttpRequestUtil.postDownTerrain(path, token, file, 30000);
+	}
+
+	public static Detect401 postDownTerrain(String path, File file, int readTime) {
+		return HttpRequestUtil.postDownTerrain(path, "", file, 30000);
+	}
+
+	public static String GET(String URl, int timeOut) {
+		URL url = null;
+		try {
+			url = new URL(URl.toString());
+			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+			httpURLConnection.addRequestProperty("User-Agent",
+					"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+			httpURLConnection.addRequestProperty("Content-Type", "application/Json; charset=utf-8");
+			httpURLConnection.setRequestMethod("GET");
+			httpURLConnection.setConnectTimeout(timeOut);
+			httpURLConnection.setReadTimeout(timeOut);
+			httpURLConnection.setDoOutput(true);
+			httpURLConnection.setDoInput(true);
+			BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
+			return br.readLine();
+		} catch (Exception exc) {
+			if (exc.getMessage().equals("Read timed out") || (exc.getMessage().equals("connect timed out"))) {
+				return null;
+			} else {
+				System.err.println(exc.toString());
+			}
+		}
+		return null;
+	}
+
+	public static String POST(String URl, JSONObject obj, int timeOut) {
+		URL url = null;
+		try {
+			url = new URL(URl.toString());
+			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+			httpURLConnection.addRequestProperty("User-Agent",
+					"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+			httpURLConnection.addRequestProperty("Content-Type", "application/Json; charset=utf-8");
+			httpURLConnection.setRequestMethod("POST");
+			httpURLConnection.setConnectTimeout(timeOut);
+			httpURLConnection.setReadTimeout(timeOut);
+			httpURLConnection.setDoOutput(true);
+			httpURLConnection.setDoInput(true);
+            httpURLConnection.setUseCaches(false);
+            OutputStream out = httpURLConnection.getOutputStream();
+            out.write(obj.toString().getBytes("UTF-8"));
+            out.flush();
+            out.close();
+			BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
+			return br.readLine();
+		} catch (Exception exc) {
+			if (exc.getMessage().equals("Read timed out") || (exc.getMessage().equals("connect timed out"))) {
+				return null;
+			} else {
+				System.err.println(exc.toString());
+			}
+		}
+		return null;
+	}
+
+	public static String PUT(String URl, JSONObject obj, int timeOut) {
+		URL url = null;
+		try {
+			url = new URL(URl.toString());
+			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+			httpURLConnection.addRequestProperty("User-Agent",
+					"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
+			httpURLConnection.addRequestProperty("Content-Type", "application/Json; charset=utf-8");
+			httpURLConnection.setRequestMethod("PUT");
+			httpURLConnection.setConnectTimeout(timeOut);
+			httpURLConnection.setReadTimeout(timeOut);
+			httpURLConnection.setDoOutput(true);
+			httpURLConnection.setDoInput(true);
+            httpURLConnection.setUseCaches(false);
+            OutputStream out = httpURLConnection.getOutputStream();
+            out.write(obj.toString().getBytes("UTF-8"));
+            out.flush();
+            out.close();
+			BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
+			return br.readLine();
+		} catch (Exception exc) {
+			if (exc.getMessage().equals("Read timed out") || (exc.getMessage().equals("connect timed out"))) {
+				return null;
+			} else {
+				System.err.println(exc.toString());
+			}
+		}
+		return null;
+	}
+	
+	public static Detect401 postDownTerrain(String path, String token, File file, int readTime) {
 		URL url = null;
 		try {
 			url = new URL(path);
@@ -105,12 +194,13 @@ public class HttpRequestUtil {
 			return new Detect401();
 		} catch (Exception e) {
 			if (e.getMessage().equals("Read timed out") || e.getMessage().equals("Connection reset")
-					|| e.getMessage().equals("connect timed out")|| e.getMessage().equals("Remote host closed connection during handshake")) {
+					|| e.getMessage().equals("connect timed out")
+					|| e.getMessage().equals("Remote host closed connection during handshake")) {
 				System.err.println(e.toString());
 				return new Detect401(500, "time out");
 			} else if (e.getMessage().equals("assets.cesium.com")) {
 				System.err.println(e.toString());
-				return new Detect401(500,"assets.cesium.com");
+				return new Detect401(500, "assets.cesium.com");
 			} else {
 				System.err.println(e.toString());
 				return new Detect401(500);
@@ -148,8 +238,8 @@ public class HttpRequestUtil {
 		}
 		return null;
 	}
-	
-	public static byte[] getRoadStatus(String path,String data) {
+
+	public static byte[] getRoadStatus(String path, String data) {
 		URL url = null;
 		try {
 			url = new URL(path);

@@ -378,4 +378,25 @@ public class FileUtil {
 			return null;
 		return dir.listFiles();
 	}
+	
+	public static boolean deleteFile(File target) {
+		if(!target.exists()) {
+			return true;
+		}
+		if(target.isFile()) {
+			return target.delete();
+		}
+		if(target.isDirectory()) {
+			File[] subFiles = target.listFiles();
+			for (int i = 0; i < subFiles.length; i++) {
+				boolean flag = FileUtil.deleteFile(subFiles[i]);
+				if(flag == false) {
+					return false;
+				}
+			}
+			return target.delete();
+		}
+		
+		return false;
+	}
 }

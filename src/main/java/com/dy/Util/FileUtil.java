@@ -6,9 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
-//import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
@@ -229,40 +227,121 @@ public class FileUtil {
 		return ret;
 	}
 
-	public static void moveFile(File file1, File file2) {
-		FileOutputStream fileOutputStream = null;
-		InputStream inputStream = null;
-		byte[] bytes = new byte[1024];
-		int temp = 0;
-		try {
-			inputStream = new FileInputStream(file1);
-			fileOutputStream = new FileOutputStream(file2);
-			while ((temp = inputStream.read(bytes)) != -1) {
-				fileOutputStream.write(bytes, 0, temp);
-				fileOutputStream.flush();
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					System.err.println(e.toString());
-					// e.printStackTrace();
+	public static void copyDir(final String origin, String destnation) throws IOException{
+		File a = new File(origin);
+		File b = new File(destnation);
+		if(a.exists()) {
+			if(!a.isDirectory()) {
+				FileUtil.copyFile(origin, destnation);
+			}else {
+				if(!b.exists()) {
+					b.mkdirs();
 				}
-			}
-			if (fileOutputStream != null) {
-				try {
-					fileOutputStream.close();
-				} catch (IOException e) {
-					System.err.println(e.toString());
-					// e.printStackTrace();
+				File[] subF = a.listFiles();
+				for (int i = 0; i < subF.length; i++) {
+					File target = subF[i];
+					FileUtil.copyDir(target.getAbsolutePath(), b.getAbsolutePath() + File.separator + target.getName());
 				}
 			}
 		}
+	}
+	
+	public static void copyFile(final String origin, String destnation) throws IOException {
+		File a = new File(origin);
+		File b = new File(destnation);
+		if (a.exists()) {
+			if (!b.exists()) {
+				try {
+					b.createNewFile();
+				} catch (IOException e) {
+					System.err.println(e.toString());
+				}
+			}
+			copyFile(a, b);
+		}
+	}
+	
+	private static final long FILE_COPY_BUFFER_SIZE = 1024 * 1024 * 30;
+	
+	public static void copyFile(final File srcFile, final File destFile) throws IOException {
+		if(!destFile.exists() || !srcFile.exists()) {
+			throw new IOException("目标文件或源文件不存在");
+		}
+		
+		if (destFile.exists() && destFile.isDirectory()) {
+            throw new IOException("目标文件为目录");
+        }
+
+        try (FileInputStream fis = new FileInputStream(srcFile);
+             FileChannel input = fis.getChannel();
+             FileOutputStream fos = new FileOutputStream(destFile);
+             FileChannel output = fos.getChannel()) {
+            final long size = input.size();
+            long pos = 0;
+            long count = 0;
+            while (pos < size) {
+                final long remain = size - pos;
+                count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
+                final long bytesCopied = output.transferFrom(input, pos, count);
+                if (bytesCopied == 0) {
+                    break;
+                }
+                pos += bytesCopied;
+            }
+            fis.close();
+            fos.close();
+        }
+        
+		final long srcLen = srcFile.length();
+		final long dstLen = destFile.length();
+		if (srcLen != dstLen) {
+            throw new IOException("拷贝文件文件大小验证失败， 源文件:'" +
+                    srcFile + "' 至目标文件:'" + destFile + "' 源文件大小: " + srcLen + " 目标文件大小: " + dstLen);
+        }
+        
+        destFile.setLastModified(srcFile.lastModified());
+	}
+	
+	public static void moveFile(final File file1,final File file2) {
+		try {
+			FileUtil.copyFile(file1, file2);
+		} catch (IOException e) {
+			System.err.println(e.toString());
+			// e.printStackTrace();
+		}
+//		FileOutputStream fileOutputStream = null;
+//		InputStream inputStream = null;
+//		byte[] bytes = new byte[(int)FILE_COPY_BUFFER_SIZE];
+//		int temp = 0;
+//		try {
+//			inputStream = new FileInputStream(file1);
+//			fileOutputStream = new FileOutputStream(file2);
+//			while ((temp = inputStream.read(bytes)) != -1) {
+//				fileOutputStream.write(bytes, 0, temp);
+//				fileOutputStream.flush();
+//			}
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (inputStream != null) {
+//				try {
+//					inputStream.close();
+//				} catch (IOException e) {
+//					System.err.println(e.toString());
+//					// e.printStackTrace();
+//				}
+//			}
+//			if (fileOutputStream != null) {
+//				try {
+//					fileOutputStream.close();
+//				} catch (IOException e) {
+//					System.err.println(e.toString());
+//					// e.printStackTrace();
+//				}
+//			}
+//		}
 
 	}
 
@@ -399,4 +478,5 @@ public class FileUtil {
 		
 		return false;
 	}
+
 }

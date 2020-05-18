@@ -177,8 +177,8 @@ public class ShapeGeoJSONUtil {
 
 	public static void main(String[] args) {
 		try {
-			String tmp = shpToGeoJSON("D:" + File.separatorChar + "ExplorData" + File.separatorChar +"Subbasin.shp");
-			File f = new File("D:" + File.separatorChar + "ExplorData" + File.separatorChar +"Subbasin.json");
+			String tmp = shpToGeoJSON("D:" + File.separatorChar + "ExplorData" + File.separatorChar +"floodpolygon.shp");
+			File f = new File("D:" + File.separatorChar + "ExplorData" + File.separatorChar +"floodpolygon.json");
 			if (!f.exists())
 				f.createNewFile();
 			FileUtil.writeString(f, tmp);

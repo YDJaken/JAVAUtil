@@ -34,8 +34,9 @@ public class Polygon extends Config {
 	 * @return {boolean}
 	 */
 	public boolean contains(Point otherPoint) {
-		if (this.isVertix(otherPoint))
+		if (this.isVertix(otherPoint)) {
 			return true;
+		}
 		boolean flag = false;
 		for (int i = 0, l = this.position.length, j = l - 1; i < l; j = i, i++) {
 			if ((this.position[i].latitude < otherPoint.latitude && this.position[j].latitude >= otherPoint.latitude)

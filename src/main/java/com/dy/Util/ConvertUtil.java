@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 public class ConvertUtil {
 	
 	public static void main(String[] args) throws UnsupportedEncodingException {
-		String a = "";
+		String a = "postgresAircas@2020";
 		String cover = convertAll(a.getBytes("UTF-8"));
 		System.out.println(cover);
 		System.out.println(new String(unConvertAll(cover),"UTF-8"));

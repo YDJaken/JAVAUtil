@@ -5,7 +5,8 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode development --config build/webpackConfig.js --open"
+    "dev": "webpack-dev-server --mode development --config build/webpackConfig.js --open",
+    "public": "webpack --mode production --config build/webpackConfig.js"
   },
   "dependencies": {
     "@apollo/client": "^3.3.4"

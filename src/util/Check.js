@@ -1,11 +1,26 @@
 /**
  * @Author DY
  */
+
+// 时间获取函数
+var getTimestamps;
+
+if (typeof performance !== 'undefined' && typeof performance.now === 'function' && isFinite(performance.now())) {
+    getTimestamps = function () {
+        return performance.now();
+    };
+} else {
+    getTimestamps = function () {
+        return Date.now();
+    };
+}
+
+export const getTimestamp = getTimestamps;
+
 /**
  * @class Check
  * @classdesc 检查参数属性和一些安全配置的工具类
  */
-
 export default class Check {
     /**
      * 检查传入参数是否已经定义

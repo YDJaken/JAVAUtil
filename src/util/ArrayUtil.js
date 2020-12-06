@@ -77,7 +77,7 @@ export default class ArrayUtil {
      * @return {*} 被删除的元素
      */
     static removeIndex(index, array) {
-        if (index === -1) {
+        if (index === -1 || index >= array.length) {
             return undefined;
         }
         if (index === 0) {

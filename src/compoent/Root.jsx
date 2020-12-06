@@ -14,14 +14,10 @@ const baseicQuerry = `query testQuary($searchValue: String!) {
     nodes {
       ... on Repository {
         url
-        nameWithOwner
-        description
-      }
-      ... on App {
-        id
         name
         description
-        url
+        stargazerCount
+        forkCount
       }
     }
   }
@@ -96,7 +92,7 @@ export default class root extends React.Component {
 
     setLimitNetNumber(limitNetNumber) {
         this.limitNetNumber = Check.number(limitNetNumber) ? limitNetNumber : 5;
-        this.totalHistory = this.limitNetNumber - 1;
+        this.totalHistory = this.limitNetNumber * 3;
         return this;
     }
 
@@ -147,7 +143,7 @@ export default class root extends React.Component {
                 width: '100%',
                 height: '100%',
                 borderSpacing: '0px',
-                minWidth: "400px",
+                minWidth: "600px",
                 minHeight: "300px",
                 border: "none"
             }}>

@@ -64,6 +64,16 @@
     3.在队列满员后将最低兴趣度删除
 ```
 
+## 测试ApolloClient请求发送机制
+```
+1.ApolloClient暂时不支持限制同时请求个数
+2.ApolloClient的请求每次均是新创建XMLHttpRequest
+3.预创建XMLHttpRequest并限制同时请求个数对服务器和终端系统均更加友好
+4.测试代码在src/test.js 
+5.综合考虑其他需求后决定使用自行封装的创建XMLHttpRequest
+```
+
+
 ## 考察点
 ```
 H5

@@ -1,9 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import xhrManager from "./util/xhrManager";
 
-import {ApolloClient, InMemoryCache, gql} from '@apollo/client';
-
-const baseicQuerry = gql`query testQuary($searchValue: String!) {
+const baseicQuerry = `query testQuary($searchValue: String!) {
   search(type: REPOSITORY, first: 15, query: $searchValue) {
     nodes {
       ... on Repository {
@@ -21,24 +20,25 @@ const baseicQuerry = gql`query testQuary($searchValue: String!) {
   }
 }`
 
-let baseRequestCount = 1;
+let baseRequestCount = 5;
 
-let xhrs = [];
-for (let i = 0; i < baseRequestCount; i++) {
-    xhrs.push(new XMLHttpRequest())
-}
+let manager = new xhrManager({
+    netNumber: baseRequestCount
+})
 
 const token = {};
 const value = "checkCount"
 
-xhrs[0].onload = (data) => {
-    if (data.currentTarget.response !== undefined) {
-        token.token = JSON.parse(data.currentTarget.response).token;
+manager.get("token.json").then((data) => {
+    if (data.response !== undefined) {
+        token.token = JSON.parse(data.response).token;
     }
-
-    ReactDOM.render(<div>test 123</div>, document.getElementById("root"))
-}
-
-xhrs[0].open("GET", "token.json");
-
-xhrs[0].send();
+    let sendData = JSON.stringify({
+        query: baseicQuerry,
+        variables: {searchValue: value}
+    });
+    manager.post(`https://api.github.com/graphql?access_token=${token.token}`, sendData, {header: {Authorization: token.token}});
+    ReactDOM.render(<div>test 123</div>, document.getElementById("root"));
+}, (data) => {
+    console.log(data);
+});

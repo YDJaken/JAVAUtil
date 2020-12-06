@@ -17,7 +17,7 @@ export default class xhrManager {
 
     _loadActiveNet() {
         for (let i = 0; i < this.netNumber; i++) {
-            if (this.xhrs[i].status === XMLHttpRequest.UNSENT) {
+            if (this.xhrs[i].readyState === XMLHttpRequest.UNSENT) {
                 return this.xhrs[i];
             }
         }
@@ -37,7 +37,11 @@ export default class xhrManager {
         return this;
     }
 
-    _startQuery(target, resolve, reject) {
+    _resetNet(target) {
+        target.abort();
+    }
+
+    _startQuery(option, target, resolve, reject) {
         target.open(option.method, option.url);
         if (Check.checkDefined(option.header)) {
             for (let header in option.header) {
@@ -46,8 +50,8 @@ export default class xhrManager {
                 }
             }
         }
-        if (Check.number(options.timeout)) {
-            target.timeout = options.timeout;
+        if (Check.number(option.timeout)) {
+            target.timeout = option.timeout;
         } else {
             target.timeout = 0;
         }
@@ -57,19 +61,36 @@ export default class xhrManager {
             target.send();
         }
         target.ontimeout = (data) => {
-            this._processQuery();
-            reject(data, 'timeout');
-        }
-        target.onabort = (data) => {
-            reject(data, 'abort');
+            reject(data);
+            new Promise((resolve1) => {
+                this._resetNet(target);
+                this._processQuery();
+                resolve1();
+            })
         }
         target.onerror = (data) => {
-            this._processQuery();
-            reject(data, 'error');
+            reject(data);
+            new Promise((resolve1) => {
+                this._resetNet(target);
+                this._processQuery();
+                resolve1();
+            })
         }
         target.onload = (data) => {
-            this._processQuery();
-            resolve(data);
+            resolve({
+                response: target.response,
+                responseText: target.responseText,
+                responseType: target.responseType,
+                responseURL: target.responseURL,
+                responseXML: target.responseXML,
+                status: target.status,
+                statusText: target.statusText
+            });
+            new Promise((resolve1) => {
+                this._resetNet(target);
+                this._processQuery();
+                resolve1();
+            })
         }
     }
 
@@ -82,22 +103,25 @@ export default class xhrManager {
         if (!Check.checkDefined(target)) {
             if (Check.checkDefined(options)) {
                 promise = new Promise((resolve, reject) => {
-                    options.promise = (target) => {
+                    options.promise = (target, option) => {
                         if (!Check.checkDefined(target)) {
                             reject(undefined, "cancel");
                         } else {
-                            this._startQuery(target, resolve, reject);
+                            this._startQuery(option, target, resolve, reject);
                         }
                     }
                 });
             }
         } else {
             let option = this.queryList.shift();
+            if (!Check.checkDefined(option)) {
+                return promise;
+            }
             if (Check.function(option.promise)) {
-                option.promise(target);
+                option.promise(target, option);
             } else {
                 promise = new Promise((resolve, reject) => {
-                    this._startQuery(target, resolve, reject);
+                    this._startQuery(option, target, resolve, reject);
                 });
             }
         }
@@ -123,7 +147,7 @@ export default class xhrManager {
 
     cancelAll() {
         for (let i = 0; i < this.netNumber; i++) {
-            if (this.xhrs[i].status !== XMLHttpRequest.UNSENT) {
+            if (this.xhrs[i].readyState !== XMLHttpRequest.UNSENT) {
                 this.xhrs[i].abort();
             }
         }

@@ -94,7 +94,7 @@ public class FileUtil {
 		long length = f.length();
 		int max = Integer.MAX_VALUE;
 		if ((length - max) > max) {
-			throw new Exception("文件过大");
+			throw new Exception("鏂囦欢杩囧ぇ");
 		}
 		int[] size = new int[2];
 		if (length < max) {
@@ -227,14 +227,14 @@ public class FileUtil {
 		return ret;
 	}
 
-	public static void copyDir(final String origin, String destnation) throws IOException{
+	public static void copyDir(final String origin, String destnation) throws IOException {
 		File a = new File(origin);
 		File b = new File(destnation);
-		if(a.exists()) {
-			if(!a.isDirectory()) {
+		if (a.exists()) {
+			if (!a.isDirectory()) {
 				FileUtil.copyFile(origin, destnation);
-			}else {
-				if(!b.exists()) {
+			} else {
+				if (!b.exists()) {
 					b.mkdirs();
 				}
 				File[] subF = a.listFiles();
@@ -245,7 +245,7 @@ public class FileUtil {
 			}
 		}
 	}
-	
+
 	public static void copyFile(final String origin, String destnation) throws IOException {
 		File a = new File(origin);
 		File b = new File(destnation);
@@ -260,49 +260,49 @@ public class FileUtil {
 			copyFile(a, b);
 		}
 	}
-	
+
 	private static final long FILE_COPY_BUFFER_SIZE = 1024 * 1024 * 30;
-	
+
 	public static void copyFile(final File srcFile, final File destFile) throws IOException {
-		if(!destFile.exists() || !srcFile.exists()) {
+		if (!destFile.exists() || !srcFile.exists()) {
 			throw new IOException("目标文件或源文件不存在");
 		}
-		
-		if (destFile.exists() && destFile.isDirectory()) {
-            throw new IOException("目标文件为目录");
-        }
 
-        try (FileInputStream fis = new FileInputStream(srcFile);
-             FileChannel input = fis.getChannel();
-             FileOutputStream fos = new FileOutputStream(destFile);
-             FileChannel output = fos.getChannel()) {
-            final long size = input.size();
-            long pos = 0;
-            long count = 0;
-            while (pos < size) {
-                final long remain = size - pos;
-                count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
-                final long bytesCopied = output.transferFrom(input, pos, count);
-                if (bytesCopied == 0) {
-                    break;
-                }
-                pos += bytesCopied;
-            }
-            fis.close();
-            fos.close();
-        }
-        
+		if (destFile.exists() && destFile.isDirectory()) {
+			throw new IOException("目标文件为目录");
+		}
+
+		try (FileInputStream fis = new FileInputStream(srcFile);
+				FileChannel input = fis.getChannel();
+				FileOutputStream fos = new FileOutputStream(destFile);
+				FileChannel output = fos.getChannel()) {
+			final long size = input.size();
+			long pos = 0;
+			long count = 0;
+			while (pos < size) {
+				final long remain = size - pos;
+				count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
+				final long bytesCopied = output.transferFrom(input, pos, count);
+				if (bytesCopied == 0) {
+					break;
+				}
+				pos += bytesCopied;
+			}
+			fis.close();
+			fos.close();
+		}
+
 		final long srcLen = srcFile.length();
 		final long dstLen = destFile.length();
 		if (srcLen != dstLen) {
-            throw new IOException("拷贝文件文件大小验证失败， 源文件:'" +
-                    srcFile + "' 至目标文件:'" + destFile + "' 源文件大小: " + srcLen + " 目标文件大小: " + dstLen);
-        }
-        
-        destFile.setLastModified(srcFile.lastModified());
+			throw new IOException("拷贝文件文件大小验证失败， 源文件:'" + srcFile + "' 至目标文件:'" + destFile + "' 源文件大小: " + srcLen
+					+ " 目标文件大小: " + dstLen);
+		}
+
+		destFile.setLastModified(srcFile.lastModified());
 	}
-	
-	public static void moveFile(final File file1,final File file2) {
+
+	public static void moveFile(final File file1, final File file2) {
 		try {
 			FileUtil.copyFile(file1, file2);
 		} catch (IOException e) {
@@ -374,6 +374,21 @@ public class FileUtil {
 			}
 			moveFile(a, b);
 		}
+	}
+
+	public static boolean writeBytes(File f, byte[] bytes) {
+		FileOutputStream fileOutputStream = null;
+		try {
+			f.setWritable(true);
+			fileOutputStream = new FileOutputStream(f);
+			fileOutputStream.write(bytes, 0, bytes.length);
+			fileOutputStream.flush();
+			fileOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -457,25 +472,25 @@ public class FileUtil {
 			return null;
 		return dir.listFiles();
 	}
-	
+
 	public static boolean deleteFile(File target) {
-		if(!target.exists()) {
+		if (!target.exists()) {
 			return true;
 		}
-		if(target.isFile()) {
+		if (target.isFile()) {
 			return target.delete();
 		}
-		if(target.isDirectory()) {
+		if (target.isDirectory()) {
 			File[] subFiles = target.listFiles();
 			for (int i = 0; i < subFiles.length; i++) {
-				boolean flag = FileUtil.deleteFile(subFiles[i]);
-				if(flag == false) {
-					return false;
+				try {
+					FileUtil.deleteFile(subFiles[i]);
+				} catch (Exception e) {
 				}
 			}
 			return target.delete();
 		}
-		
+
 		return false;
 	}
 

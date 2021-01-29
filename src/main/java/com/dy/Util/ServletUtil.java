@@ -80,6 +80,10 @@ public class ServletUtil {
 	}
 
 	public static Object getRequestParameter(HttpServletRequest request, String ID) {
+		return ServletUtil.getRequestParameter(request, ID, null);
+	}
+
+	public static Object getRequestParameter(HttpServletRequest request, String ID, Object origin) {
 		Object data = request.getParameter(ID);
 		if (data == null) {
 			data = request.getAttribute(ID);
@@ -87,7 +91,7 @@ public class ServletUtil {
 				data = ServletUtil.getRequestPayload(request);
 			}
 		}
-		return data;
+		return data == null ? origin : data;
 	}
 
 	public static boolean isJsonString(String target) {

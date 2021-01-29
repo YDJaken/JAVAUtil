@@ -33,7 +33,7 @@ public class JSONObjectUtil {
 			}
 		}
 		if (ls.size() == 0) {
-			ls.add(new Byte((byte) 0x00));
+			ls.add((byte) 0x00);
 		}
 		Byte[] rs = new Byte[ls.size()];
 		ls.toArray(rs);

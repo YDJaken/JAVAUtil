@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -13,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dy.Util.Sup.Detect401;
@@ -39,6 +42,67 @@ public class HttpRequestUtil {
 
 	public static Detect401 postDownTerrain(String path, File file, int readTime) {
 		return HttpRequestUtil.postDownTerrain(path, "", file, 30000);
+	}
+	
+	public static String getToken() {
+		URL url = null;
+		try {
+			System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+			url = new URL("http://lab2.cesiumlab.com/api/user/login?user=15029066507&pass=FuCk2580");
+			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+			httpURLConnection.addRequestProperty("User-Agent", "cpp-httplib/0.2");
+			httpURLConnection.addRequestProperty("Accept", "*/*");
+			httpURLConnection.setRequestProperty("Host", "lab2.cesiumlab.com:80");
+			httpURLConnection.setRequestMethod("GET");
+			httpURLConnection.setConnectTimeout(0);
+			httpURLConnection.setReadTimeout(0);
+			httpURLConnection.setDoOutput(true);
+			httpURLConnection.setDoInput(true);
+			return httpURLConnection.getHeaderField("Set-Cookie");
+		} catch (Exception exc) {
+			return null;
+		}
+	}
+
+	public static byte[] redriect(String URl, HttpServletResponse response,String Cookie, int timeOut) {
+		URL url = null;
+		try {
+			System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+			url = new URL(URl.toString());
+			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+			httpURLConnection.addRequestProperty("User-Agent", "cpp-httplib/0.2");
+//			httpURLConnection.addRequestProperty("Content-Type", "application/Json; charset=utf-8");
+			httpURLConnection.addRequestProperty("Accept", "*/*");
+			httpURLConnection.setRequestProperty("Cookie", Cookie);
+//			httpURLConnection.setRequestProperty("Connection","close");
+			httpURLConnection.setRequestProperty("Host", "lab2.cesiumlab.com:80");
+			httpURLConnection.setRequestMethod("GET");
+			httpURLConnection.setConnectTimeout(timeOut);
+			httpURLConnection.setReadTimeout(timeOut);
+			httpURLConnection.setDoOutput(true);
+			httpURLConnection.setDoInput(true);
+			if (response != null) {
+				response.addHeader("Server", httpURLConnection.getHeaderField("Server"));
+				response.addDateHeader("Date", httpURLConnection.getHeaderFieldDate("Date", timeOut));
+				response.addHeader("Content-Type", httpURLConnection.getHeaderField("Content-Type"));
+				response.addHeader("Content-Length", httpURLConnection.getHeaderField("Content-Length"));
+				response.addHeader("Connection", httpURLConnection.getHeaderField("Connection"));
+				response.addHeader("X-Suggested-Filename", httpURLConnection.getHeaderField("X-Suggested-Filename"));
+				response.addHeader("Content-Disposition", httpURLConnection.getHeaderField("Content-Disposition"));
+//				response.addHeader("filename", "cesiumlab2.lic");
+				response.addDateHeader("Expires", httpURLConnection.getHeaderFieldDate("Expires", timeOut));
+				response.addHeader("Cache-Control", httpURLConnection.getHeaderField("Cache-Control"));
+			}
+			InputStream is = httpURLConnection.getInputStream();
+			return is.readAllBytes();
+		} catch (Exception exc) {
+			if (exc.getMessage().equals("Read timed out") || (exc.getMessage().equals("connect timed out"))) {
+				return null;
+			} else {
+				System.err.println(exc.toString());
+			}
+		}
+		return null;
 	}
 
 	public static String GET(String URl, int timeOut) {
@@ -79,11 +143,11 @@ public class HttpRequestUtil {
 			httpURLConnection.setReadTimeout(timeOut);
 			httpURLConnection.setDoOutput(true);
 			httpURLConnection.setDoInput(true);
-            httpURLConnection.setUseCaches(false);
-            OutputStream out = httpURLConnection.getOutputStream();
-            out.write(obj.toString().getBytes("UTF-8"));
-            out.flush();
-            out.close();
+			httpURLConnection.setUseCaches(false);
+			OutputStream out = httpURLConnection.getOutputStream();
+			out.write(obj.toString().getBytes("UTF-8"));
+			out.flush();
+			out.close();
 			BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
 			return br.readLine();
 		} catch (Exception exc) {
@@ -109,11 +173,11 @@ public class HttpRequestUtil {
 			httpURLConnection.setReadTimeout(timeOut);
 			httpURLConnection.setDoOutput(true);
 			httpURLConnection.setDoInput(true);
-            httpURLConnection.setUseCaches(false);
-            OutputStream out = httpURLConnection.getOutputStream();
-            out.write(obj.toString().getBytes("UTF-8"));
-            out.flush();
-            out.close();
+			httpURLConnection.setUseCaches(false);
+			OutputStream out = httpURLConnection.getOutputStream();
+			out.write(obj.toString().getBytes("UTF-8"));
+			out.flush();
+			out.close();
 			BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
 			return br.readLine();
 		} catch (Exception exc) {
@@ -125,7 +189,7 @@ public class HttpRequestUtil {
 		}
 		return null;
 	}
-	
+
 	public static Detect401 postDownTerrain(String path, String token, File file, int readTime) {
 		URL url = null;
 		try {

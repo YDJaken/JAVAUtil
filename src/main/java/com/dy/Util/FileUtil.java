@@ -94,7 +94,7 @@ public class FileUtil {
 		long length = f.length();
 		int max = Integer.MAX_VALUE;
 		if ((length - max) > max) {
-			throw new Exception("鏂囦欢杩囧ぇ");
+			throw new Exception("文件过大");
 		}
 		int[] size = new int[2];
 		if (length < max) {
